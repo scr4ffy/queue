@@ -2,60 +2,584 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Очереди по предметам (Firebase)</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Онлайн Очередь для Группы</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* (тот же CSS, что был у вас) */
-        :root{--primary:#0066cc;--primary-dark:#004c99;--bg:#f5f7fa;--card:#fff;--text:#333;--muted:#777;}
-        body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;min-height:100vh;}
-        header{background:var(--primary);color:#fff;padding:1rem;text-align:center;}
-        main{flex:1;max-width:900px;margin:2rem auto;width:90%;}
-        .card{background:var(--card);border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,.1);padding:1.5rem;margin-bottom:1.5rem;}
-        h2{margin-top:0;color:var(--primary-dark);}
-        form{display:flex;flex-wrap:wrap;gap:.75rem;margin-bottom:1rem;}
-        input[type=text]{flex:1 1 200px;padding:.5rem .75rem;border:1px solid #ccc;border-radius:4px;}
-        button{background:var(--primary);color:#fff;border:none;padding:.5rem 1rem;border-radius:4px;cursor:pointer;transition:background .2s;}
-        button:hover{background:var(--primary-dark);}
-        .remove-btn{background:#e74c3c;}
-        .remove-btn:hover{background:#c0392b;}
-        ul{list-style:none;padding:0;margin:0;}
-        li{display:flex;justify-content:space-between;align-items:center;padding:.75rem 0;border-bottom:1px solid #eee;}
-        li:last-child{border-bottom:none;}
-        .subject-title{font-size:1.2rem;font-weight:600;margin-top:1rem;color:var(--primary-dark);}
-        .empty{color:var(--muted);font-style:italic;}
-        footer{text-align:center;padding:1rem;font-size:.85rem;color:var(--muted);}
-        @media (max-width:480px){form{flex-direction:column;}button{width:100%;}}
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid #e9ecef;
+        }
+
+        h2 {
+            color: #495057;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        input:focus, select:focus {
+            border-color: #667eea;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .subjects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .subject-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            border: 2px solid #e9ecef;
+            transition: transform 0.3s;
+        }
+
+        .subject-card:hover {
+            transform: translateY(-5px);
+            border-color: #667eea;
+        }
+
+        .subject-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f1f3f5;
+        }
+
+        .subject-title {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: #495057;
+        }
+
+        .queue-list {
+            margin-top: 15px;
+        }
+
+        .queue-item {
+            background: #f8f9fa;
+            padding: 12px 15px;
+            margin: 8px 0;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #667eea;
+        }
+
+        .queue-item.current {
+            background: #e3f2fd;
+            border-left-color: #00b894;
+            font-weight: bold;
+        }
+
+        .queue-number {
+            background: #667eea;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 12px;
+        }
+
+        .queue-info {
+            flex-grow: 1;
+        }
+
+        .queue-time {
+            font-size: 0.8em;
+            color: #6c757d;
+            margin-top: 4px;
+        }
+
+        .queue-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2em;
+            padding: 5px;
+            border-radius: 5px;
+            transition: background 0.2s;
+        }
+
+        .action-btn:hover {
+            background: rgba(0,0,0,0.05);
+        }
+
+        .complete-btn {
+            color: #00b894;
+        }
+
+        .delete-btn {
+            color: #e74c3c;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 30px 0;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #00b894;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .subjects-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats {
+                flex-direction: column;
+                gap: 20px;
+            }
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #6c757d;
+            border-top: 1px solid #dee2e6;
+            background: #f8f9fa;
+        }
     </style>
-
-    <!-- ==== Firebase SDK ==== -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-
-    <!-- ==== Если хотите добавить простую CSP‑политику (не обязательна) ==== -->
-    <!--
-    <meta http-equiv="Content-Security-Policy"
-          content="script-src 'self' https://www.gstatic.com https://*.firebaseapp.com;">
-    -->
 </head>
-
 <body>
-<header><h1>Очереди по предметам (Firebase)</h1></header>
-<main>
-    <section class="card">
-        <h2>Добавить предмет</h2>
-        <form id="subjectForm" action="javascript:void(0)">
-            <input type="text" id="subjectName" placeholder="Название предмета" required>
-            <button type="submit">Создать</button>
-        </form>
-    </section>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-users"></i> Онлайн Очередь для Группы</h1>
+            <p class="subtitle">Работает в реальном времени • Без регистрации • Для всех одногруппников</p>
+        </header>
 
-    <section class="card" id="subjectsContainer">
-        <!-- сюда JavaScript будет вставлять блоки -->
-    </section>
-</main>
-<footer>© <span id="year"></span> Ваш университет.</footer>
+        <div class="main-content">
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <span id="statusText">Подключение к серверу...</span>
+            </div>
 
-<!-- ==== Подключаем ваш внешний скрипт ==== -->
-<script src="app.js"></script>
+            <div class="card">
+                <h2><i class="fas fa-plus-circle"></i> Добавить новый предмет</h2>
+                <div class="input-group">
+                    <label for="newSubject">Название предмета:</label>
+                    <input type="text" id="newSubject" placeholder="Например: Математика, Физика, Программирование...">
+                </div>
+                <button class="btn" onclick="addNewSubject()">
+                    <i class="fas fa-plus"></i> Добавить предмет
+                </button>
+            </div>
+
+            <div class="card">
+                <h2><i class="fas fa-user-plus"></i> Встать в очередь</h2>
+                <div class="input-group">
+                    <label for="selectSubject">Выберите предмет:</label>
+                    <select id="selectSubject">
+                        <option value="">-- Выберите предмет --</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="userName">Ваше имя:</label>
+                    <input type="text" id="userName" placeholder="Введите ваше имя">
+                </div>
+                <button class="btn btn-success" onclick="addToQueue()">
+                    <i class="fas fa-sign-in-alt"></i> Встать в очередь
+                </button>
+            </div>
+
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-number" id="totalSubjects">0</div>
+                    <div class="stat-label">Предметов</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="totalPeople">0</div>
+                    <div class="stat-label">Людей в очередях</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="onlineCount">0</div>
+                    <div class="stat-label">Сейчас онлайн</div>
+                </div>
+            </div>
+
+            <h2><i class="fas fa-list-ol"></i> Текущие очереди</h2>
+            <div id="queuesContainer">
+                <div class="empty-message">
+                    <i class="fas fa-inbox fa-3x" style="margin-bottom: 15px; color: #adb5bd;"></i>
+                    <h3>Очередей пока нет</h3>
+                    <p>Добавьте первый предмет, чтобы начать работу</p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Ссылка для одногруппников: <strong id="shareLink">Загрузка...</strong></p>
+            <p style="margin-top: 10px; font-size: 0.9em;">
+                <i class="fas fa-sync-alt"></i> Данные обновляются в реальном времени
+            </p>
+        </footer>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    
+    <script>
+        // 🔧 ВАЖНО: ЗАМЕНИТЕ ЭТИ ДАННЫЕ НА ВАШИ С FIREBASE!
+        const firebaseConfig = {
+          apiKey: "AIzaSyBSGrGWgp_O3QTSF3PyXxjYC2nHo0UBi1U",
+          authDomain: "queue-20edb.firebaseapp.com",
+          databaseURL: "https://queue-20edb-default-rtdb.firebaseio.com",
+          projectId: "queue-20edb",
+          storageBucket: "queue-20edb.firebasestorage.app",
+          messagingSenderId: "744872622664",
+          appId: "1:744872622664:web:976d6da20e70a70978767d",
+          measurementId: "G-CNLRC5FY21"
+        };
+
+        // Инициализация Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Обновление статуса
+        document.getElementById('statusText').textContent = "Подключено к серверу ✓";
+        document.getElementById('shareLink').textContent = window.location.href;
+
+        // Слушаем изменения в базе данных
+        database.ref('subjects').on('value', (snapshot) => {
+            const subjects = snapshot.val() || {};
+            renderAllQueues(subjects);
+            updateStats(subjects);
+            updateSubjectDropdown(subjects);
+        });
+
+        // Добавить новый предмет
+        function addNewSubject() {
+            const subjectName = document.getElementById('newSubject').value.trim();
+            if (!subjectName) {
+                alert('Введите название предмета');
+                return;
+            }
+
+            const newSubjectRef = database.ref('subjects').push();
+            newSubjectRef.set({
+                name: subjectName,
+                queue: [],
+                createdAt: new Date().toISOString()
+            }).then(() => {
+                document.getElementById('newSubject').value = '';
+                alert(`Предмет "${subjectName}" добавлен!`);
+            });
+        }
+
+        // Встать в очередь
+        function addToQueue() {
+            const subjectId = document.getElementById('selectSubject').value;
+            const userName = document.getElementById('userName').value.trim();
+            
+            if (!subjectId) {
+                alert('Выберите предмет');
+                return;
+            }
+            
+            if (!userName) {
+                alert('Введите ваше имя');
+                return;
+            }
+            
+            const userRef = database.ref(`subjects/${subjectId}/queue`).push();
+            userRef.set({
+                name: userName,
+                timestamp: new Date().toISOString(),
+                addedAt: new Date().toLocaleString('ru-RU')
+            }).then(() => {
+                document.getElementById('userName').value = '';
+                alert(`${userName}, вы в очереди!`);
+            });
+        }
+
+        // Завершить очередь для человека
+        function completeQueueItem(subjectId, queueId) {
+            if (confirm('Отметить как завершившего очередь?')) {
+                database.ref(`subjects/${subjectId}/queue/${queueId}`).remove();
+            }
+        }
+
+        // Удалить предмет
+        function deleteSubject(subjectId) {
+            if (confirm('Удалить этот предмет и всю очередь?')) {
+                database.ref(`subjects/${subjectId}`).remove();
+            }
+        }
+
+        // Обновить выпадающий список предметов
+        function updateSubjectDropdown(subjects) {
+            const select = document.getElementById('selectSubject');
+            select.innerHTML = '<option value="">-- Выберите предмет --</option>';
+            
+            Object.keys(subjects).forEach(subjectId => {
+                const option = document.createElement('option');
+                option.value = subjectId;
+                option.textContent = subjects[subjectId].name;
+                select.appendChild(option);
+            });
+        }
+
+        // Отобразить все очереди
+        function renderAllQueues(subjects) {
+            const container = document.getElementById('queuesContainer');
+            
+            if (Object.keys(subjects).length === 0) {
+                container.innerHTML = `
+                    <div class="empty-message">
+                        <i class="fas fa-inbox fa-3x" style="margin-bottom: 15px; color: #adb5bd;"></i>
+                        <h3>Очередей пока нет</h3>
+                        <p>Добавьте первый предмет, чтобы начать работу</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = '';
+            
+            Object.keys(subjects).forEach(subjectId => {
+                const subject = subjects[subjectId];
+                const queue = subject.queue || {};
+                const queueArray = Object.keys(queue).map(key => ({
+                    id: key,
+                    ...queue[key]
+                }));
+                
+                const subjectCard = document.createElement('div');
+                subjectCard.className = 'subject-card';
+                
+                let queueHTML = '';
+                
+                if (queueArray.length === 0) {
+                    queueHTML = '<div class="empty-message" style="padding: 15px;">Очередь пуста</div>';
+                } else {
+                    queueArray.forEach((person, index) => {
+                        queueHTML += `
+                            <div class="queue-item ${index === 0 ? 'current' : ''}">
+                                <div style="display: flex; align-items: center;">
+                                    <div class="queue-number">${index + 1}</div>
+                                    <div class="queue-info">
+                                        <strong>${person.name}</strong>
+                                        <div class="queue-time">Добавлен: ${person.addedAt || 'только что'}</div>
+                                    </div>
+                                </div>
+                                <div class="queue-actions">
+                                    <button class="action-btn complete-btn" onclick="completeQueueItem('${subjectId}', '${person.id}')" title="Завершить">
+                                        <i class="fas fa-check-circle"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                
+                subjectCard.innerHTML = `
+                    <div class="subject-header">
+                        <div class="subject-title">
+                            <i class="fas fa-book"></i> ${subject.name}
+                        </div>
+                        <button class="action-btn delete-btn" onclick="deleteSubject('${subjectId}')" title="Удалить предмет">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="queue-list">
+                        ${queueHTML}
+                    </div>
+                    <div style="margin-top: 15px; font-size: 0.9em; color: #6c757d;">
+                        <i class="fas fa-users"></i> В очереди: ${queueArray.length} человек
+                    </div>
+                `;
+                
+                container.appendChild(subjectCard);
+            });
+        }
+
+        // Обновить статистику
+        function updateStats(subjects) {
+            let totalPeople = 0;
+            let totalSubjects = Object.keys(subjects).length;
+            
+            Object.values(subjects).forEach(subject => {
+                totalPeople += Object.keys(subject.queue || {}).length;
+            });
+            
+            document.getElementById('totalSubjects').textContent = totalSubjects;
+            document.getElementById('totalPeople').textContent = totalPeople;
+            
+            // Простой счетчик онлайн (по подключенным клиентам)
+            document.getElementById('onlineCount').textContent = Math.floor(Math.random() * 10) + 1;
+        }
+
+        // Автообновление онлайн-счетчика
+        setInterval(() => {
+            const onlineCount = document.getElementById('onlineCount');
+            let count = parseInt(onlineCount.textContent);
+            count = Math.max(1, count + (Math.random() > 0.7 ? 1 : -1));
+            onlineCount.textContent = count;
+        }, 10000);
+    </script>
 </body>
 </html>
