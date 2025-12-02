@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Очереди по предметам (Firebase)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- ---------- СТИЛИ (можно менять) ---------- -->
+    <style>
+        :root{
+            --primary:#0066cc;
+            --primary-dark:#004c99;
+            --bg:#f5f7fa;
+            --card:#fff;
+            --text:#333;
+            --muted:#777;
+        }
+        body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;min-height:100vh;}
+        header{background:var(--primary);color:#fff;padding:1rem;text-align:center;}
+        main{flex:1;max-width:900px;margin:2rem auto;width:90%;}
+        .card{background:var(--card);border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,.1);padding:1.5rem;margin-bottom:1.5rem;}
+        h2{margin-top:0;color:var(--primary-dark);}
+        form{display:flex;flex-wrap:wrap;gap:.75rem;margin-bottom:1rem;}
+        input[type=text]{flex:1 1 200px;padding:.5rem .75rem;border:1px solid #ccc;border-radius:4px;}
+        button{background:var(--primary);color:#fff;border:none;padding:.5rem 1rem;border-radius:4px;cursor:pointer;transition:background .2s;}
+        button:hover{background:var(--primary-dark);}
+        .remove-btn{background:#e74c3c;}
+        .remove-btn:hover{background:#c0392b;}
+        ul{list-style:none;padding:0;margin:0;}
+        li{display:flex;justify-content:space-between;align-items:center;padding:.75rem 0;border-bottom:1px solid #eee;}
+        li:last-child{border-bottom:none;}
+        .subject-title{font-size:1.2rem;font-weight:600;margin-top:1rem;color:var(--primary-dark);}
+        .empty{color:var(--muted);font-style:italic;}
+        footer{text-align:center;padding:1rem;font-size:.85rem;color:var(--muted);}
+        @media (max-width:480px){form{flex-direction:column;}button{width:100%;}}
+    </style>
+
+    <!-- ---------- Firebase SDK ---------- -->
+    <!-- 1️⃣ подключаем SDK (версия 10.x на момент написания) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+    <!-- 2️⃣ инициализируем приложение -->
+    <script>
+        // ⚠️ Замените YOUR_PROJECT_ID на ваш ID из Firebase Console
+        const firebaseConfig = {
+            databaseURL: "https://queue-20edb-default-rtdb.firebaseio.com"
+        };
+        // Инициализация
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();               // ссылка на Realtime Database
+        const subjectsRef = db.ref('subjects');       // корневой узел, где будем хранить всё
+    </script>
+</head>
+
+<body>
+<header>
+    <h1>Очереди по предметам (Firebase)</h1>
+</header>
+
+<main>
+    <!-- ==== Форма создания нового предмета ==== -->
+    <section class="card">
+        <h2>Добавить предмет</h2>
+        <form id="subjectForm">
+            <input type="text" id="subjectName" placeholder="Название предмета" required>
+            <button type="submit">Создать</button>
+        </form>
+    </section>
+
+    <!-- ==== Список предметов и их очередей ==== -->
+    <section class="card" id="subjectsContainer">
+        <!-- JavaScript заполняет содержимое -->
+    </section>
+</main>
+
+<footer>
+    © <span id="year"></span> Ваш университет. Сделано с ❤️
+</footer>
+
+<!-- ---------- ЛОГИКА (JS) ---------- -->
+<script>
+/* ---------- Утилиты ---------- */
+const $ = s => document.querySelector(s);
+
+/* ---------- РЕНДЕРИНГ ВСЕХ ПРЕДМЕТОВ И ОЧЕРЕДЕЙ ---------- */
+function renderAll() {
+    subjectsRef.once('value').then(snap => {
+        const data = snap.val() || {};
+        const container = $('#subjectsContainer');
+        container.innerHTML = '';
+
+        const subjects = Object.keys(data);
+        if (subjects.length === 0) {
+            container.innerHTML = `<p class="empty">Пока нет предметов. Добавьте их выше.</p>`;
+            return;
+        }
+
+        subjects.forEach(subject => {
+            const block = document.createElement('div');
+            block.className = 'subject-block';
+
+            /* ---- Заголовок + кнопка удаления предмета ---- */
+            const titleDiv = document.createElement('div');
+            titleDiv.style.display = 'flex';
+            titleDiv.style.justifyContent = 'space-between';
+            titleDiv.style.alignItems = 'center';
+
+            const title = document.createElement('h3');
+            title.className = 'subject-title';
+            title.textContent = subject;
+
+            const delSubjectBtn = document.createElement('button');
+            delSubjectBtn.className = 'remove-btn';
+            delSubjectBtn.textContent = 'Удалить предмет';
+            delSubjectBtn.onclick = () => {
+                if (confirm(`Удалить предмет "${subject}" и всю его очередь?`)) {
+                    subjectsRef.child(subject).remove();
+                }
+            };
+            titleDiv.append(title, delSubjectBtn);
+            block.appendChild(titleDiv);
+
+            /* ---- Форма записи студента в эту очередь ---- */
+            const form = document.createElement('form');
+            form.innerHTML = `
+                <input type="text" placeholder="Имя студента" class="student-name" required>
+                <input type="text" placeholder="Комментарий (необязательно)" class="student-note">
+                <button type="submit">Записаться</button>
+            `;
+            form.onsubmit = e => {
+                e.preventDefault();
+                const name = form.querySelector('.student-name').value.trim();
+                const note = form.querySelector('.student-note').value.trim();
+                if (!name) return;
+                // push() создаёт уникальный ключ в /subjects/<subject>/queue/
+                subjectsRef.child(`${subject}/queue`).push({name, note});
+                form.reset();
+            };
+            block.appendChild(form);
+
+            /* ---- Список текущей очереди ---- */
+            const ul = document.createElement('ul');
+            const queueObj = (data[subject] && data[subject].queue) || {};
+            const entries = Object.entries(queueObj);
+            if (entries.length === 0) {
+                ul.innerHTML = `<li class="empty">Очередь пуста.</li>`;
+            } else {
+                entries.forEach(([key, item]) => {
+                    const li = document.createElement('li');
+
+                    const nameSpan = document.createElement('span');
+                    nameSpan.className = 'name';
+                    nameSpan.textContent = item.name;
+                    if (item.note) {
+                        const note = document.createElement('small');
+                        note.style.color = 'var(--muted)';
+                        note.style.marginLeft = '0.5rem';
+                        note.textContent = `(${item.note})`;
+                        nameSpan.appendChild(note);
+                    }
+
+                    const rmBtn = document.createElement('button');
+                    rmBtn.className = 'remove-btn';
+                    rmBtn.textContent = 'Удалить';
+                    rmBtn.onclick = () => {
+                        subjectsRef.child(`${subject}/queue/${key}`).remove();
+                    };
+                    li.append(nameSpan, rmBtn);
+                    ul.appendChild(li);
+                });
+            }
+            block.appendChild(ul);
+            container.appendChild(block);
+        });
+    });
+}
+
+/* ---------- Добавление нового предмета ---------- */
+$('#subjectForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const name = $('#subjectName').value.trim();
+    if (!name) return;
+    subjectsRef.child(name).once('value').then(snap => {
+        if (snap.exists()) {
+            alert('Такой предмет уже существует!');
+        } else {
+            subjectsRef.child(name).set({queue: {}});
+            $('#subjectName').value = '';
+        }
+    });
+});
+
+/* ---------- Синхронные обновления ----------
+   Каждый раз, когда данные меняются, сразу перерисовываем UI.
+*/
+subjectsRef.on('value', renderAll);
+
+/* ---------- Инициализация ---------- */
+document.addEventListener('DOMContentLoaded', () => {
+    $('#year').textContent = new Date().getFullYear();
+});
+</script>
+</body>
+</html>
