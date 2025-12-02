@@ -308,12 +308,13 @@
     <div class="container">
         <header>
             <h1><i class="fas fa-users"></i> Онлайн Очередь</h1>
+            <p class="subtitle">Работает в реальном времени • Без регистрации • Для всех одногруппников</p>
         </header>
 
         <div class="main-content">
             <div class="status-indicator">
                 <div class="status-dot"></div>
-                <span id="statusText">Подключение к серверу...</span>
+                <span id="statusText">Подключено к серверу ✓</span>
             </div>
 
             <div class="card">
@@ -353,10 +354,6 @@
                     <div class="stat-number" id="totalPeople">0</div>
                     <div class="stat-label">Людей в очередях</div>
                 </div>
-                <div class="stat-item">
-                    <div class="stat-number" id="onlineCount">0</div>
-                    <div class="stat-label">Сейчас онлайн</div>
-                </div>
             </div>
 
             <h2><i class="fas fa-list-ol"></i> Текущие очереди</h2>
@@ -370,7 +367,7 @@
         </div>
 
         <footer>
-            <p>Ссылка для одногруппников: <strong id="shareLink">Загрузка...</strong></p>
+            <p>Ссылка для одногруппников: <strong>https://scr4ffy.github.io/queue/</strong></p>
             <p style="margin-top: 10px; font-size: 0.9em;">
                 <i class="fas fa-sync-alt"></i> Данные обновляются в реальном времени
             </p>
@@ -382,7 +379,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     
     <script>
-        // 🔧 ВАЖНО: ЗАМЕНИТЕ ЭТИ ДАННЫЕ НА ВАШИ С FIREBASE!
         const firebaseConfig = {
           apiKey: "AIzaSyBSGrGWgp_O3QTSF3PyXxjYC2nHo0UBi1U",
           authDomain: "queue-20edb.firebaseapp.com",
@@ -397,10 +393,6 @@
         // Инициализация Firebase
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
-
-        // Обновление статуса
-        document.getElementById('statusText').textContent = "Подключено к серверу ✓";
-        document.getElementById('shareLink').textContent = window.location.href;
 
         // Слушаем изменения в базе данных
         database.ref('subjects').on('value', (snapshot) => {
@@ -567,18 +559,7 @@
             
             document.getElementById('totalSubjects').textContent = totalSubjects;
             document.getElementById('totalPeople').textContent = totalPeople;
-            
-            // Простой счетчик онлайн (по подключенным клиентам)
-            document.getElementById('onlineCount').textContent = Math.floor(Math.random() * 10) + 1;
         }
-
-        // Автообновление онлайн-счетчика
-        setInterval(() => {
-            const onlineCount = document.getElementById('onlineCount');
-            let count = parseInt(onlineCount.textContent);
-            count = Math.max(1, count + (Math.random() > 0.7 ? 1 : -1));
-            onlineCount.textContent = count;
-        }, 10000);
     </script>
 </body>
 </html>
