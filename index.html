@@ -37,15 +37,14 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
-    <!-- ==== Инициализация Firebase (замените YOUR_PROJECT_ID) ==== -->
+    <!-- ==== Инициализация (замените YOUR_PROJECT_ID) ==== -->
     <script>
         const firebaseConfig = {
-            // → получаем в консоли Firebase → Realtime Database → «Database URL»
             databaseURL: "https://queue-20edb-default-rtdb.firebaseio.com/"
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        const subjectsRef = db.ref('subjects');   // корень, где будем хранить предметы
+        const subjectsRef = db.ref('subjects');
     </script>
 </head>
 
@@ -55,20 +54,20 @@
     <!-- ===== Форма создания предмета ===== -->
     <section class="card">
         <h2>Добавить предмет</h2>
-        <form id="subjectForm">
+        <form id="subjectForm" action="javascript:void(0)">
             <input type="text" id="subjectName" placeholder="Название предмета" required>
             <button type="submit">Создать</button>
         </form>
     </section>
 
-    <!-- ===== Список предметов + их очередей ===== -->
+    <!-- ===== Список предметов и их очередей ===== -->
     <section class="card" id="subjectsContainer">
-        <!-- сюда JavaScript будет вставлять блоки -->
+        <!-- JavaScript вставит сюда блоки -->
     </section>
 </main>
 <footer>© <span id="year"></span> Ваш университет.</footer>
 
-<!-- ==== Всё, что относится к бизнес‑логике – **в самом конце** ==== -->
+<!-- ==== Весь ваш JS – в самом конце body ==== -->
 <script>
 /* ---------- Утилиты ---------- */
 const $ = s => document.querySelector(s);
@@ -91,7 +90,7 @@ function renderAll() {
                 const block = document.createElement('div');
                 block.className = 'subject-block';
 
-                /* ----- Заголовок + кнопка удаления ----- */
+                /* ----- Заголовок + удаление ----- */
                 const titleDiv = document.createElement('div');
                 titleDiv.style.display = 'flex';
                 titleDiv.style.justifyContent = 'space-between';
@@ -113,13 +112,14 @@ function renderAll() {
                 titleDiv.append(title, delBtn);
                 block.appendChild(titleDiv);
 
-                /* ----- Форма записи студента ----- */
+                /* ----- Форма добавления студента ----- */
                 const form = document.createElement('form');
                 form.innerHTML = `
                     <input type="text" placeholder="Имя студента" class="student-name" required>
                     <input type="text" placeholder="Комментарий (необязательно)" class="student-note">
                     <button type="submit">Записаться</button>
                 `;
+                form.setAttribute('action', 'javascript:void(0)');   // ← защита от 404
                 form.onsubmit = e => {
                     e.preventDefault();
                     const name = form.querySelector('.student-name').value.trim();
@@ -172,38 +172,35 @@ function renderAll() {
 
 /* ---------- Добавление предмета ---------- */
 $('#subjectForm').addEventListener('submit', e => {
-    e.preventDefault();                     // ← без этого страница будет перезагружаться
+    e.preventDefault();                     // ← отмена обычной отправки формы
     const name = $('#subjectName').value.trim();
     if (!name) {
         alert('Введите название предмета');
         return;
     }
 
-    // Проверяем, нет ли уже предмета с таким именем
     subjectsRef.child(name).once('value')
         .then(snap => {
             if (snap.exists()) {
                 alert('Такой предмет уже существует');
                 return;
             }
-            // Создаём пустой объект {queue: {}} для нового предмета
             return subjectsRef.child(name).set({queue: {}});
         })
         .then(() => {
-            $('#subjectName').value = '';   // очистить поле
-            // Если событие `on('value')` почему‑то не сработало, принудительно обновляем UI
-            renderAll();
+            $('#subjectName').value = '';
+            renderAll();   // если по какой‑то причине on('value') не сработал
         })
         .catch(err => console.error('add subject error:', err));
 });
 
-/* ---------- Автоматическое обновление UI ---------- */
+/* ---------- Подписка на изменения в базе ---------- */
 subjectsRef.on('value', renderAll);
 
-/* ---------- Инициализация (год в футере) ---------- */
+/* ---------- Инициализация страницы ---------- */
 document.addEventListener('DOMContentLoaded', () => {
     $('#year').textContent = new Date().getFullYear();
-    renderAll();   // на случай, если on('value') ещё не сработал
+    renderAll();   // безопасный вызов на старте
 });
 </script>
 </body>
