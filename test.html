@@ -41,6 +41,79 @@
             --footer-bg: #16213e;
         }
 
+        .cheese-mode {
+            --primary-gradient: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            --primary-color: #FFD700;
+            --secondary-color: #FFA500;
+            --bg-color: #FFF8DC;
+            --card-bg: #FFEBCD;
+            --text-color: #8B4513;
+            --border-color: #D2691E;
+            --shadow-color: rgba(139, 69, 19, 0.2);
+            --queue-item-bg: #FAEBD7;
+            --current-queue-bg: #FFE4B5;
+            --footer-bg: #FFEBCD;
+        }
+
+        .cheese-mode header {
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23FFD700' fill-opacity='0.3' fill-rule='evenodd'/%3E%3C/svg%3E");
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cheese-mode header::before {
+            content: "🧀";
+            position: absolute;
+            font-size: 2em;
+            animation: floatCheese 15s linear infinite;
+        }
+
+        .cheese-mode header::after {
+            content: "🧀";
+            position: absolute;
+            font-size: 1.5em;
+            top: 20%;
+            right: 15%;
+            animation: floatCheese 20s linear infinite reverse;
+        }
+
+        @keyframes floatCheese {
+            0% { transform: translateX(-100px) rotate(0deg); }
+            100% { transform: translateX(calc(100vw + 100px)) rotate(360deg); }
+        }
+
+        .cheese-mode .status-dot {
+            background: #FFA500;
+        }
+
+        .cheese-mode .queue-item {
+            border-left: 4px solid #FFD700;
+        }
+
+        .cheese-mode .queue-item.current {
+            border-left-color: #FF8C00;
+        }
+
+        .cheese-mode .queue-number {
+            background: #FFD700;
+            color: #8B4513;
+        }
+
+        .cheese-mode .complete-btn {
+            color: #D2691E;
+        }
+
+        .cheese-mode .subject-card:hover {
+            border-color: #FFA500;
+            box-shadow: 0 5px 15px rgba(255, 165, 0, 0.3);
+        }
+
+        .cheese-mode input:focus,
+        .cheese-mode select:focus {
+            border-color: #FFA500;
+            box-shadow: 0 0 0 3px rgba(255, 165, 0, 0.2);
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: var(--primary-gradient);
@@ -99,6 +172,50 @@
         .theme-toggle:hover {
             background: rgba(255, 255, 255, 0.3);
             transform: scale(1.1);
+        }
+
+        .easter-egg-indicator {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            color: white;
+            transition: all 0.3s;
+            opacity: 0.1;
+        }
+
+        .easter-egg-indicator:hover {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .cheese-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #FFD700;
+            color: #8B4513;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(139, 69, 19, 0.3);
+            display: none;
+            z-index: 1000;
+            animation: slideIn 0.5s ease-out;
+            font-weight: bold;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
 
         .main-content {
@@ -170,6 +287,10 @@
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 7px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .cheese-mode .btn:hover {
+            box-shadow: 0 7px 20px rgba(255, 165, 0, 0.3);
         }
 
         .subjects-grid {
@@ -253,7 +374,8 @@
             margin-top: 4px;
         }
 
-        .dark-mode .queue-time {
+        .dark-mode .queue-time,
+        .cheese-mode .queue-time {
             color: #a0aec0;
         }
 
@@ -277,7 +399,8 @@
             background: rgba(0,0,0,0.05);
         }
 
-        .dark-mode .action-btn:hover {
+        .dark-mode .action-btn:hover,
+        .cheese-mode .action-btn:hover {
             background: rgba(255,255,255,0.1);
         }
 
@@ -299,7 +422,8 @@
             margin: 20px 0;
         }
 
-        .dark-mode .empty-message {
+        .dark-mode .empty-message,
+        .cheese-mode .empty-message {
             color: #a0aec0;
         }
 
@@ -362,12 +486,17 @@
                 gap: 20px;
             }
             
-            .theme-toggle {
+            .theme-toggle,
+            .easter-egg-indicator {
                 top: 15px;
                 right: 15px;
                 width: 40px;
                 height: 40px;
                 font-size: 1.2em;
+            }
+            
+            .easter-egg-indicator {
+                left: 15px;
             }
         }
 
@@ -382,10 +511,17 @@
     </style>
 </head>
 <body>
+    <div class="cheese-notification" id="cheeseNotification">
+        🧀 Сырная тема активирована! 🧀
+    </div>
+
     <div class="container">
         <header>
             <button class="theme-toggle" id="themeToggle" title="Переключить тему">
                 <i class="fas fa-moon"></i>
+            </button>
+            <button class="easter-egg-indicator" id="easterEggIndicator" title="Секретная кнопка...">
+                ?
             </button>
             <h1><i class="fas fa-users"></i> Онлайн Очередь</h1>
         </header>
@@ -446,7 +582,6 @@
         </div>
 
         <footer>
-            <p>Ссылка для одногруппников: <strong>https://scr4ffy.github.io/queue/</strong></p>
             <p style="margin-top: 10px; font-size: 0.9em;">
                 <i class="fas fa-sync-alt"></i> Данные обновляются в реальном времени
             </p>
@@ -474,29 +609,98 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // Управление темой
+        // Управление темами
         const themeToggle = document.getElementById('themeToggle');
+        const easterEggIndicator = document.getElementById('easterEggIndicator');
+        const cheeseNotification = document.getElementById('cheeseNotification');
         const htmlElement = document.documentElement;
+
+        // Переменные для пасхалки
+        let cheeseClickCount = 0;
+        let cheeseTimer = null;
 
         // Проверяем сохраненную тему
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme === 'dark') {
             htmlElement.classList.add('dark-mode');
             themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        } else if (savedTheme === 'cheese') {
+            htmlElement.classList.add('cheese-mode');
+            themeToggle.innerHTML = '<i class="fas fa-cheese"></i>';
+            showCheeseNotification();
+        }
+
+        // Обработчик пасхалки
+        easterEggIndicator.addEventListener('click', () => {
+            cheeseClickCount++;
+            
+            if (cheeseClickCount === 1) {
+                // Первый клик - меняем иконку
+                easterEggIndicator.innerHTML = '🧀';
+                easterEggIndicator.title = 'Продолжай...';
+                
+                // Запускаем таймер сброса
+                cheeseTimer = setTimeout(() => {
+                    cheeseClickCount = 0;
+                    easterEggIndicator.innerHTML = '?';
+                    easterEggIndicator.title = 'Секретная кнопка...';
+                }, 3000);
+            } else if (cheeseClickCount === 3) {
+                // Третий клик - активируем сырную тему
+                clearTimeout(cheeseTimer);
+                activateCheeseTheme();
+                cheeseClickCount = 0;
+                easterEggIndicator.innerHTML = '?';
+                easterEggIndicator.title = 'Секретная кнопка...';
+            }
+        });
+
+        // Активация сырной темы
+        function activateCheeseTheme() {
+            htmlElement.classList.remove('dark-mode');
+            htmlElement.classList.add('cheese-mode');
+            localStorage.setItem('theme', 'cheese');
+            themeToggle.innerHTML = '<i class="fas fa-cheese"></i>';
+            themeToggle.title = 'Переключить на обычную тему';
+            
+            showCheeseNotification();
+            
+            // Добавляем звуковой эффект (опционально)
+            try {
+                const audio = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEAQB8AAEAfAAABAAgAZGF0YQ');
+                audio.volume = 0.3;
+                audio.play();
+            } catch (e) {}
+        }
+
+        // Показ уведомления
+        function showCheeseNotification() {
+            cheeseNotification.style.display = 'block';
+            setTimeout(() => {
+                cheeseNotification.style.display = 'none';
+            }, 3000);
         }
 
         // Переключение темы
         themeToggle.addEventListener('click', () => {
-            htmlElement.classList.toggle('dark-mode');
-            
             if (htmlElement.classList.contains('dark-mode')) {
-                localStorage.setItem('theme', 'dark');
-                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-                themeToggle.title = 'Переключить на светлую тему';
-            } else {
+                // С темной на светлую
+                htmlElement.classList.remove('dark-mode');
                 localStorage.setItem('theme', 'light');
                 themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
                 themeToggle.title = 'Переключить на темную тему';
+            } else if (htmlElement.classList.contains('cheese-mode')) {
+                // С сырной на светлую
+                htmlElement.classList.remove('cheese-mode');
+                localStorage.setItem('theme', 'light');
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                themeToggle.title = 'Переключить на темную тему';
+            } else {
+                // Со светлой на темную
+                htmlElement.classList.add('dark-mode');
+                localStorage.setItem('theme', 'dark');
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                themeToggle.title = 'Переключить на светлую тему';
             }
         });
 
