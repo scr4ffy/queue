@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <title>Очереди по предметам (Firebase)</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- ---------- СТИЛИ (можно менять) ---------- -->
     <style>
         :root{
             --primary:#0066cc;
@@ -35,31 +33,26 @@
         @media (max-width:480px){form{flex-direction:column;}button{width:100%;}}
     </style>
 
-    <!-- ---------- Firebase SDK ---------- -->
-    <!-- 1️⃣ подключаем SDK (версия 10.x на момент написания) -->
+    <!-- ==== Firebase SDK ==== -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
-    <!-- 2️⃣ инициализируем приложение -->
+    <!-- ==== Инициализация Firebase (замените YOUR_PROJECT_ID) ==== -->
     <script>
-        // ⚠️ Замените YOUR_PROJECT_ID на ваш ID из Firebase Console
         const firebaseConfig = {
-            databaseURL: "https://queue-20edb-default-rtdb.firebaseio.com"
+            // → получаем в консоли Firebase → Realtime Database → «Database URL»
+            databaseURL: "https://queue-20edb-default-rtdb.firebaseio.com/"
         };
-        // Инициализация
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();               // ссылка на Realtime Database
-        const subjectsRef = db.ref('subjects');       // корневой узел, где будем хранить всё
+        const db = firebase.database();
+        const subjectsRef = db.ref('subjects');   // корень, где будем хранить предметы
     </script>
 </head>
 
 <body>
-<header>
-    <h1>Очереди по предметам (Firebase)</h1>
-</header>
-
+<header><h1>Очереди по предметам (Firebase)</h1></header>
 <main>
-    <!-- ==== Форма создания нового предмета ==== -->
+    <!-- ===== Форма создания предмета ===== -->
     <section class="card">
         <h2>Добавить предмет</h2>
         <form id="subjectForm">
@@ -68,137 +61,149 @@
         </form>
     </section>
 
-    <!-- ==== Список предметов и их очередей ==== -->
+    <!-- ===== Список предметов + их очередей ===== -->
     <section class="card" id="subjectsContainer">
-        <!-- JavaScript заполняет содержимое -->
+        <!-- сюда JavaScript будет вставлять блоки -->
     </section>
 </main>
+<footer>© <span id="year"></span> Ваш университет.</footer>
 
-<footer>
-    © <span id="year"></span> Ваш университет. Сделано с ❤️
-</footer>
-
-<!-- ---------- ЛОГИКА (JS) ---------- -->
+<!-- ==== Всё, что относится к бизнес‑логике – **в самом конце** ==== -->
 <script>
 /* ---------- Утилиты ---------- */
 const $ = s => document.querySelector(s);
 
-/* ---------- РЕНДЕРИНГ ВСЕХ ПРЕДМЕТОВ И ОЧЕРЕДЕЙ ---------- */
+/* ---------- Рендеринг всех предметов ---------- */
 function renderAll() {
-    subjectsRef.once('value').then(snap => {
-        const data = snap.val() || {};
-        const container = $('#subjectsContainer');
-        container.innerHTML = '';
+    subjectsRef.once('value')
+        .then(snap => {
+            const data = snap.val() || {};
+            const container = $('#subjectsContainer');
+            container.innerHTML = '';
 
-        const subjects = Object.keys(data);
-        if (subjects.length === 0) {
-            container.innerHTML = `<p class="empty">Пока нет предметов. Добавьте их выше.</p>`;
-            return;
-        }
-
-        subjects.forEach(subject => {
-            const block = document.createElement('div');
-            block.className = 'subject-block';
-
-            /* ---- Заголовок + кнопка удаления предмета ---- */
-            const titleDiv = document.createElement('div');
-            titleDiv.style.display = 'flex';
-            titleDiv.style.justifyContent = 'space-between';
-            titleDiv.style.alignItems = 'center';
-
-            const title = document.createElement('h3');
-            title.className = 'subject-title';
-            title.textContent = subject;
-
-            const delSubjectBtn = document.createElement('button');
-            delSubjectBtn.className = 'remove-btn';
-            delSubjectBtn.textContent = 'Удалить предмет';
-            delSubjectBtn.onclick = () => {
-                if (confirm(`Удалить предмет "${subject}" и всю его очередь?`)) {
-                    subjectsRef.child(subject).remove();
-                }
-            };
-            titleDiv.append(title, delSubjectBtn);
-            block.appendChild(titleDiv);
-
-            /* ---- Форма записи студента в эту очередь ---- */
-            const form = document.createElement('form');
-            form.innerHTML = `
-                <input type="text" placeholder="Имя студента" class="student-name" required>
-                <input type="text" placeholder="Комментарий (необязательно)" class="student-note">
-                <button type="submit">Записаться</button>
-            `;
-            form.onsubmit = e => {
-                e.preventDefault();
-                const name = form.querySelector('.student-name').value.trim();
-                const note = form.querySelector('.student-note').value.trim();
-                if (!name) return;
-                // push() создаёт уникальный ключ в /subjects/<subject>/queue/
-                subjectsRef.child(`${subject}/queue`).push({name, note});
-                form.reset();
-            };
-            block.appendChild(form);
-
-            /* ---- Список текущей очереди ---- */
-            const ul = document.createElement('ul');
-            const queueObj = (data[subject] && data[subject].queue) || {};
-            const entries = Object.entries(queueObj);
-            if (entries.length === 0) {
-                ul.innerHTML = `<li class="empty">Очередь пуста.</li>`;
-            } else {
-                entries.forEach(([key, item]) => {
-                    const li = document.createElement('li');
-
-                    const nameSpan = document.createElement('span');
-                    nameSpan.className = 'name';
-                    nameSpan.textContent = item.name;
-                    if (item.note) {
-                        const note = document.createElement('small');
-                        note.style.color = 'var(--muted)';
-                        note.style.marginLeft = '0.5rem';
-                        note.textContent = `(${item.note})`;
-                        nameSpan.appendChild(note);
-                    }
-
-                    const rmBtn = document.createElement('button');
-                    rmBtn.className = 'remove-btn';
-                    rmBtn.textContent = 'Удалить';
-                    rmBtn.onclick = () => {
-                        subjectsRef.child(`${subject}/queue/${key}`).remove();
-                    };
-                    li.append(nameSpan, rmBtn);
-                    ul.appendChild(li);
-                });
+            const subjects = Object.keys(data);
+            if (subjects.length === 0) {
+                container.innerHTML = `<p class="empty">Пока нет предметов. Добавьте их выше.</p>`;
+                return;
             }
-            block.appendChild(ul);
-            container.appendChild(block);
-        });
-    });
+
+            subjects.forEach(subject => {
+                const block = document.createElement('div');
+                block.className = 'subject-block';
+
+                /* ----- Заголовок + кнопка удаления ----- */
+                const titleDiv = document.createElement('div');
+                titleDiv.style.display = 'flex';
+                titleDiv.style.justifyContent = 'space-between';
+                titleDiv.style.alignItems = 'center';
+
+                const title = document.createElement('h3');
+                title.className = 'subject-title';
+                title.textContent = subject;
+
+                const delBtn = document.createElement('button');
+                delBtn.className = 'remove-btn';
+                delBtn.textContent = 'Удалить предмет';
+                delBtn.onclick = () => {
+                    if (confirm(`Удалить предмет "${subject}" и всю очередь?`)) {
+                        subjectsRef.child(subject).remove()
+                            .catch(err => console.error('remove subject error:', err));
+                    }
+                };
+                titleDiv.append(title, delBtn);
+                block.appendChild(titleDiv);
+
+                /* ----- Форма записи студента ----- */
+                const form = document.createElement('form');
+                form.innerHTML = `
+                    <input type="text" placeholder="Имя студента" class="student-name" required>
+                    <input type="text" placeholder="Комментарий (необязательно)" class="student-note">
+                    <button type="submit">Записаться</button>
+                `;
+                form.onsubmit = e => {
+                    e.preventDefault();
+                    const name = form.querySelector('.student-name').value.trim();
+                    const note = form.querySelector('.student-note').value.trim();
+                    if (!name) return;
+                    subjectsRef.child(`${subject}/queue`).push({name, note})
+                        .catch(err => console.error('push student error:', err));
+                    form.reset();
+                };
+                block.appendChild(form);
+
+                /* ----- Список очереди ----- */
+                const ul = document.createElement('ul');
+                const queueObj = (data[subject] && data[subject].queue) || {};
+                const entries = Object.entries(queueObj);
+                if (entries.length === 0) {
+                    ul.innerHTML = `<li class="empty">Очередь пуста.</li>`;
+                } else {
+                    entries.forEach(([key, item]) => {
+                        const li = document.createElement('li');
+
+                        const nameSpan = document.createElement('span');
+                        nameSpan.className = 'name';
+                        nameSpan.textContent = item.name;
+                        if (item.note) {
+                            const note = document.createElement('small');
+                            note.style.color = 'var(--muted)';
+                            note.style.marginLeft = '0.5rem';
+                            note.textContent = `(${item.note})`;
+                            nameSpan.appendChild(note);
+                        }
+
+                        const rmBtn = document.createElement('button');
+                        rmBtn.className = 'remove-btn';
+                        rmBtn.textContent = 'Удалить';
+                        rmBtn.onclick = () => {
+                            subjectsRef.child(`${subject}/queue/${key}`).remove()
+                                .catch(err => console.error('remove student error:', err));
+                        };
+                        li.append(nameSpan, rmBtn);
+                        ul.appendChild(li);
+                    });
+                }
+                block.appendChild(ul);
+                container.appendChild(block);
+            });
+        })
+        .catch(err => console.error('renderAll error:', err));
 }
 
-/* ---------- Добавление нового предмета ---------- */
+/* ---------- Добавление предмета ---------- */
 $('#subjectForm').addEventListener('submit', e => {
-    e.preventDefault();
+    e.preventDefault();                     // ← без этого страница будет перезагружаться
     const name = $('#subjectName').value.trim();
-    if (!name) return;
-    subjectsRef.child(name).once('value').then(snap => {
-        if (snap.exists()) {
-            alert('Такой предмет уже существует!');
-        } else {
-            subjectsRef.child(name).set({queue: {}});
-            $('#subjectName').value = '';
-        }
-    });
+    if (!name) {
+        alert('Введите название предмета');
+        return;
+    }
+
+    // Проверяем, нет ли уже предмета с таким именем
+    subjectsRef.child(name).once('value')
+        .then(snap => {
+            if (snap.exists()) {
+                alert('Такой предмет уже существует');
+                return;
+            }
+            // Создаём пустой объект {queue: {}} для нового предмета
+            return subjectsRef.child(name).set({queue: {}});
+        })
+        .then(() => {
+            $('#subjectName').value = '';   // очистить поле
+            // Если событие `on('value')` почему‑то не сработало, принудительно обновляем UI
+            renderAll();
+        })
+        .catch(err => console.error('add subject error:', err));
 });
 
-/* ---------- Синхронные обновления ----------
-   Каждый раз, когда данные меняются, сразу перерисовываем UI.
-*/
+/* ---------- Автоматическое обновление UI ---------- */
 subjectsRef.on('value', renderAll);
 
-/* ---------- Инициализация ---------- */
+/* ---------- Инициализация (год в футере) ---------- */
 document.addEventListener('DOMContentLoaded', () => {
     $('#year').textContent = new Date().getFullYear();
+    renderAll();   // на случай, если on('value') ещё не сработал
 });
 </script>
 </body>
