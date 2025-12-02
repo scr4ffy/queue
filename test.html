@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сайт для очереди на парах</title>
+    <link rel="icon" href="logo.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --bg-color: #ffffff;
+            --card-bg: #f8f9fa;
+            --text-color: #333333;
+            --border-color: #dee2e6;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --queue-item-bg: #f8f9fa;
+            --current-queue-bg: #e3f2fd;
+            --footer-bg: #f8f9fa;
+        }
+
+        .dark-mode {
+            --primary-gradient: linear-gradient(135deg, #7c93f5 0%, #9a6bd1 100%);
+            --primary-color: #7c93f5;
+            --secondary-color: #9a6bd1;
+            --bg-color: #1a1a2e;
+            --card-bg: #16213e;
+            --text-color: #e6e6e6;
+            --border-color: #2d3748;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+            --queue-item-bg: #0f3460;
+            --current-queue-bg: #1e3a5f;
+            --footer-bg: #16213e;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--primary-gradient);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--text-color);
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--bg-color);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px var(--shadow-color);
+            overflow: hidden;
+            transition: background 0.3s;
+        }
+
+        header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            color: white;
+            transition: all 0.3s;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border-color);
+            transition: background 0.3s, border-color 0.3s;
+        }
+
+        h2 {
+            color: var(--text-color);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: color 0.3s;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-color);
+            transition: color 0.3s;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .subjects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .subject-card {
+            background: var(--bg-color);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 5px 15px var(--shadow-color);
+            border: 2px solid var(--border-color);
+            transition: transform 0.3s, background 0.3s, border-color 0.3s;
+        }
+
+        .subject-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+        }
+
+        .subject-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .subject-title {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+
+        .queue-list {
+            margin-top: 15px;
+        }
+
+        .queue-item {
+            background: var(--queue-item-bg);
+            padding: 12px 15px;
+            margin: 8px 0;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid var(--primary-color);
+            transition: background 0.3s;
+        }
+
+        .queue-item.current {
+            background: var(--current-queue-bg);
+            border-left-color: #00b894;
+            font-weight: bold;
+        }
+
+        .queue-number {
+            background: var(--primary-color);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 12px;
+        }
+
+        .queue-info {
+            flex-grow: 1;
+        }
+
+        .queue-time {
+            font-size: 0.8em;
+            color: #6c757d;
+            margin-top: 4px;
+        }
+
+        .dark-mode .queue-time {
+            color: #a0aec0;
+        }
+
+        .queue-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2em;
+            padding: 5px;
+            border-radius: 5px;
+            transition: background 0.2s;
+            color: var(--text-color);
+        }
+
+        .action-btn:hover {
+            background: rgba(0,0,0,0.05);
+        }
+
+        .dark-mode .action-btn:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .complete-btn {
+            color: #00b894;
+        }
+
+        .delete-btn {
+            color: #e74c3c;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+            padding: 30px;
+            background: var(--card-bg);
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .dark-mode .empty-message {
+            color: #a0aec0;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            background: var(--primary-gradient);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 30px 0;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            background: var(--card-bg);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #00b894;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .subjects-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .theme-toggle {
+                top: 15px;
+                right: 15px;
+                width: 40px;
+                height: 40px;
+                font-size: 1.2em;
+            }
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-color);
+            border-top: 1px solid var(--border-color);
+            background: var(--footer-bg);
+            transition: background 0.3s, color 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <button class="theme-toggle" id="themeToggle" title="Переключить тему">
+                <i class="fas fa-moon"></i>
+            </button>
+            <h1><i class="fas fa-users"></i> Онлайн Очередь</h1>
+        </header>
+
+        <div class="main-content">
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <span id="statusText">Подключено к серверу ✓</span>
+            </div>
+
+            <div class="card">
+                <h2><i class="fas fa-plus-circle"></i> Добавить новый предмет</h2>
+                <div class="input-group">
+                    <label for="newSubject">Название предмета:</label>
+                    <input type="text" id="newSubject" placeholder="Например: Математика, Физика, Программирование...">
+                </div>
+                <button class="btn" onclick="addNewSubject()">
+                    <i class="fas fa-plus"></i> Добавить предмет
+                </button>
+            </div>
+
+            <div class="card">
+                <h2><i class="fas fa-user-plus"></i> Встать в очередь</h2>
+                <div class="input-group">
+                    <label for="selectSubject">Выберите предмет:</label>
+                    <select id="selectSubject">
+                        <option value="">-- Выберите предмет --</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="userName">Ваше имя:</label>
+                    <input type="text" id="userName" placeholder="Введите ваше имя">
+                </div>
+                <button class="btn" onclick="addToQueue()">
+                    <i class="fas fa-sign-in-alt"></i> Встать в очередь
+                </button>
+            </div>
+
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-number" id="totalSubjects">0</div>
+                    <div class="stat-label">Предметов</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="totalPeople">0</div>
+                    <div class="stat-label">Людей в очередях</div>
+                </div>
+            </div>
+
+            <h2><i class="fas fa-list-ol"></i> Текущие очереди</h2>
+            <div id="queuesContainer">
+                <div class="empty-message">
+                    <i class="fas fa-inbox fa-3x" style="margin-bottom: 15px; color: #adb5bd;"></i>
+                    <h3>Очередей пока нет</h3>
+                    <p>Добавьте первый предмет, чтобы начать работу</p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Ссылка для одногруппников: <strong>https://scr4ffy.github.io/queue/</strong></p>
+            <p style="margin-top: 10px; font-size: 0.9em;">
+                <i class="fas fa-sync-alt"></i> Данные обновляются в реальном времени
+            </p>
+        </footer>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    
+    <script>
+        // 🔧 Конфигурация Firebase
+        const firebaseConfig = {
+          apiKey: "AIzaSyBSGrGWgp_O3QTSF3PyXxjYC2nHo0UBi1U",
+          authDomain: "queue-20edb.firebaseapp.com",
+          databaseURL: "https://queue-20edb-default-rtdb.firebaseio.com",
+          projectId: "queue-20edb",
+          storageBucket: "queue-20edb.firebasestorage.app",
+          messagingSenderId: "744872622664",
+          appId: "1:744872622664:web:976d6da20e70a70978767d",
+          measurementId: "G-CNLRC5FY21"
+        };
+
+        // Инициализация Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Управление темой
+        const themeToggle = document.getElementById('themeToggle');
+        const htmlElement = document.documentElement;
+
+        // Проверяем сохраненную тему
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            htmlElement.classList.add('dark-mode');
+            themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        }
+
+        // Переключение темы
+        themeToggle.addEventListener('click', () => {
+            htmlElement.classList.toggle('dark-mode');
+            
+            if (htmlElement.classList.contains('dark-mode')) {
+                localStorage.setItem('theme', 'dark');
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                themeToggle.title = 'Переключить на светлую тему';
+            } else {
+                localStorage.setItem('theme', 'light');
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                themeToggle.title = 'Переключить на темную тему';
+            }
+        });
+
+        // Остальной код остается без изменений
+        // Слушаем изменения в базе данных
+        database.ref('subjects').on('value', (snapshot) => {
+            const subjects = snapshot.val() || {};
+            renderAllQueues(subjects);
+            updateStats(subjects);
+            updateSubjectDropdown(subjects);
+        });
+
+        // Добавить новый предмет
+        function addNewSubject() {
+            const subjectName = document.getElementById('newSubject').value.trim();
+            if (!subjectName) {
+                alert('Введите название предмета');
+                return;
+            }
+
+            const newSubjectRef = database.ref('subjects').push();
+            newSubjectRef.set({
+                name: subjectName,
+                queue: [],
+                createdAt: new Date().toISOString()
+            }).then(() => {
+                document.getElementById('newSubject').value = '';
+                alert(`Предмет "${subjectName}" добавлен!`);
+            });
+        }
+
+        // Встать в очередь
+        function addToQueue() {
+            const subjectId = document.getElementById('selectSubject').value;
+            const userName = document.getElementById('userName').value.trim();
+            
+            if (!subjectId) {
+                alert('Выберите предмет');
+                return;
+            }
+            
+            if (!userName) {
+                alert('Введите ваше имя');
+                return;
+            }
+            
+            const userRef = database.ref(`subjects/${subjectId}/queue`).push();
+            userRef.set({
+                name: userName,
+                timestamp: new Date().toISOString(),
+                addedAt: new Date().toLocaleString('ru-RU')
+            }).then(() => {
+                document.getElementById('userName').value = '';
+                alert(`${userName}, вы в очереди!`);
+            });
+        }
+
+        // Завершить очередь для человека
+        function completeQueueItem(subjectId, queueId) {
+            if (confirm('Отметить как завершившего очередь?')) {
+                database.ref(`subjects/${subjectId}/queue/${queueId}`).remove();
+            }
+        }
+
+        // Удалить предмет
+        function deleteSubject(subjectId) {
+            if (confirm('Удалить этот предмет и всю очередь?')) {
+                database.ref(`subjects/${subjectId}`).remove();
+            }
+        }
+
+        // Обновить выпадающий список предметов
+        function updateSubjectDropdown(subjects) {
+            const select = document.getElementById('selectSubject');
+            select.innerHTML = '<option value="">-- Выберите предмет --</option>';
+            
+            Object.keys(subjects).forEach(subjectId => {
+                const option = document.createElement('option');
+                option.value = subjectId;
+                option.textContent = subjects[subjectId].name;
+                select.appendChild(option);
+            });
+        }
+
+        // Отобразить все очереди
+        function renderAllQueues(subjects) {
+            const container = document.getElementById('queuesContainer');
+            
+            if (Object.keys(subjects).length === 0) {
+                container.innerHTML = `
+                    <div class="empty-message">
+                        <i class="fas fa-inbox fa-3x" style="margin-bottom: 15px; color: #adb5bd;"></i>
+                        <h3>Очередей пока нет</h3>
+                        <p>Добавьте первый предмет, чтобы начать работу</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = '';
+            
+            Object.keys(subjects).forEach(subjectId => {
+                const subject = subjects[subjectId];
+                const queue = subject.queue || {};
+                const queueArray = Object.keys(queue).map(key => ({
+                    id: key,
+                    ...queue[key]
+                }));
+                
+                const subjectCard = document.createElement('div');
+                subjectCard.className = 'subject-card';
+                
+                let queueHTML = '';
+                
+                if (queueArray.length === 0) {
+                    queueHTML = '<div class="empty-message" style="padding: 15px;">Очередь пуста</div>';
+                } else {
+                    queueArray.forEach((person, index) => {
+                        queueHTML += `
+                            <div class="queue-item ${index === 0 ? 'current' : ''}">
+                                <div style="display: flex; align-items: center;">
+                                    <div class="queue-number">${index + 1}</div>
+                                    <div class="queue-info">
+                                        <strong>${person.name}</strong>
+                                        <div class="queue-time">Добавлен: ${person.addedAt || 'только что'}</div>
+                                    </div>
+                                </div>
+                                <div class="queue-actions">
+                                    <button class="action-btn complete-btn" onclick="completeQueueItem('${subjectId}', '${person.id}')" title="Завершить">
+                                        <i class="fas fa-check-circle"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                
+                subjectCard.innerHTML = `
+                    <div class="subject-header">
+                        <div class="subject-title">
+                            <i class="fas fa-book"></i> ${subject.name}
+                        </div>
+                        <button class="action-btn delete-btn" onclick="deleteSubject('${subjectId}')" title="Удалить предмет">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="queue-list">
+                        ${queueHTML}
+                    </div>
+                    <div style="margin-top: 15px; font-size: 0.9em; color: #6c757d;">
+                        <i class="fas fa-users"></i> В очереди: ${queueArray.length} человек
+                    </div>
+                `;
+                
+                container.appendChild(subjectCard);
+            });
+        }
+
+        // Обновить статистику
+        function updateStats(subjects) {
+            let totalPeople = 0;
+            let totalSubjects = Object.keys(subjects).length;
+            
+            Object.values(subjects).forEach(subject => {
+                totalPeople += Object.keys(subject.queue || {}).length;
+            });
+            
+            document.getElementById('totalSubjects').textContent = totalSubjects;
+            document.getElementById('totalPeople').textContent = totalPeople;
+        }
+    </script>
+</body>
+</html>
