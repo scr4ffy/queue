@@ -5,14 +5,8 @@
     <title>Очереди по предметам (Firebase)</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-        :root{
-            --primary:#0066cc;
-            --primary-dark:#004c99;
-            --bg:#f5f7fa;
-            --card:#fff;
-            --text:#333;
-            --muted:#777;
-        }
+        /* (тот же CSS, что был у вас) */
+        :root{--primary:#0066cc;--primary-dark:#004c99;--bg:#f5f7fa;--card:#fff;--text:#333;--muted:#777;}
         body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;min-height:100vh;}
         header{background:var(--primary);color:#fff;padding:1rem;text-align:center;}
         main{flex:1;max-width:900px;margin:2rem auto;width:90%;}
@@ -37,21 +31,16 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
-    <!-- ==== Инициализация (замените YOUR_PROJECT_ID) ==== -->
-    <script>
-        const firebaseConfig = {
-            databaseURL: "https://queue-20edb-default-rtdb.firebaseio.com/"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-        const subjectsRef = db.ref('subjects');
-    </script>
+    <!-- ==== Если хотите добавить простую CSP‑политику (не обязательна) ==== -->
+    <!--
+    <meta http-equiv="Content-Security-Policy"
+          content="script-src 'self' https://www.gstatic.com https://*.firebaseapp.com;">
+    -->
 </head>
 
 <body>
 <header><h1>Очереди по предметам (Firebase)</h1></header>
 <main>
-    <!-- ===== Форма создания предмета ===== -->
     <section class="card">
         <h2>Добавить предмет</h2>
         <form id="subjectForm" action="javascript:void(0)">
@@ -60,148 +49,13 @@
         </form>
     </section>
 
-    <!-- ===== Список предметов и их очередей ===== -->
     <section class="card" id="subjectsContainer">
-        <!-- JavaScript вставит сюда блоки -->
+        <!-- сюда JavaScript будет вставлять блоки -->
     </section>
 </main>
 <footer>© <span id="year"></span> Ваш университет.</footer>
 
-<!-- ==== Весь ваш JS – в самом конце body ==== -->
-<script>
-/* ---------- Утилиты ---------- */
-const $ = s => document.querySelector(s);
-
-/* ---------- Рендеринг всех предметов ---------- */
-function renderAll() {
-    subjectsRef.once('value')
-        .then(snap => {
-            const data = snap.val() || {};
-            const container = $('#subjectsContainer');
-            container.innerHTML = '';
-
-            const subjects = Object.keys(data);
-            if (subjects.length === 0) {
-                container.innerHTML = `<p class="empty">Пока нет предметов. Добавьте их выше.</p>`;
-                return;
-            }
-
-            subjects.forEach(subject => {
-                const block = document.createElement('div');
-                block.className = 'subject-block';
-
-                /* ----- Заголовок + удаление ----- */
-                const titleDiv = document.createElement('div');
-                titleDiv.style.display = 'flex';
-                titleDiv.style.justifyContent = 'space-between';
-                titleDiv.style.alignItems = 'center';
-
-                const title = document.createElement('h3');
-                title.className = 'subject-title';
-                title.textContent = subject;
-
-                const delBtn = document.createElement('button');
-                delBtn.className = 'remove-btn';
-                delBtn.textContent = 'Удалить предмет';
-                delBtn.onclick = () => {
-                    if (confirm(`Удалить предмет "${subject}" и всю очередь?`)) {
-                        subjectsRef.child(subject).remove()
-                            .catch(err => console.error('remove subject error:', err));
-                    }
-                };
-                titleDiv.append(title, delBtn);
-                block.appendChild(titleDiv);
-
-                /* ----- Форма добавления студента ----- */
-                const form = document.createElement('form');
-                form.innerHTML = `
-                    <input type="text" placeholder="Имя студента" class="student-name" required>
-                    <input type="text" placeholder="Комментарий (необязательно)" class="student-note">
-                    <button type="submit">Записаться</button>
-                `;
-                form.setAttribute('action', 'javascript:void(0)');   // ← защита от 404
-                form.onsubmit = e => {
-                    e.preventDefault();
-                    const name = form.querySelector('.student-name').value.trim();
-                    const note = form.querySelector('.student-note').value.trim();
-                    if (!name) return;
-                    subjectsRef.child(`${subject}/queue`).push({name, note})
-                        .catch(err => console.error('push student error:', err));
-                    form.reset();
-                };
-                block.appendChild(form);
-
-                /* ----- Список очереди ----- */
-                const ul = document.createElement('ul');
-                const queueObj = (data[subject] && data[subject].queue) || {};
-                const entries = Object.entries(queueObj);
-                if (entries.length === 0) {
-                    ul.innerHTML = `<li class="empty">Очередь пуста.</li>`;
-                } else {
-                    entries.forEach(([key, item]) => {
-                        const li = document.createElement('li');
-
-                        const nameSpan = document.createElement('span');
-                        nameSpan.className = 'name';
-                        nameSpan.textContent = item.name;
-                        if (item.note) {
-                            const note = document.createElement('small');
-                            note.style.color = 'var(--muted)';
-                            note.style.marginLeft = '0.5rem';
-                            note.textContent = `(${item.note})`;
-                            nameSpan.appendChild(note);
-                        }
-
-                        const rmBtn = document.createElement('button');
-                        rmBtn.className = 'remove-btn';
-                        rmBtn.textContent = 'Удалить';
-                        rmBtn.onclick = () => {
-                            subjectsRef.child(`${subject}/queue/${key}`).remove()
-                                .catch(err => console.error('remove student error:', err));
-                        };
-                        li.append(nameSpan, rmBtn);
-                        ul.appendChild(li);
-                    });
-                }
-                block.appendChild(ul);
-                container.appendChild(block);
-            });
-        })
-        .catch(err => console.error('renderAll error:', err));
-}
-
-/* ---------- Добавление предмета ---------- */
-$('#subjectForm').addEventListener('submit', e => {
-    e.preventDefault();                     // ← отмена обычной отправки формы
-    const name = $('#subjectName').value.trim();
-    if (!name) {
-        alert('Введите название предмета');
-        return;
-    }
-
-    subjectsRef.child(name).once('value')
-        .then(snap => {
-            if (snap.exists()) {
-                alert('Такой предмет уже существует');
-                return;
-            }
-            return subjectsRef.child(name).set({queue: {}});
-        })
-        .then(() => {
-            $('#subjectName').value = '';
-            renderAll();   // если по какой‑то причине on('value') не сработал
-        })
-        .catch(err => console.error('add subject error:', err));
-});
-
-/* ---------- Подписка на изменения в базе ---------- */
-subjectsRef.on('value', renderAll);
-
-/* ---------- Инициализация страницы ---------- */
-document.addEventListener('DOMContentLoaded', () => {
-    $('#year').textContent = new Date().getFullYear();
-    renderAll();   // безопасный вызов на старте
-});
-</script>
+<!-- ==== Подключаем ваш внешний скрипт ==== -->
+<script src="app.js"></script>
 </body>
 </html>
