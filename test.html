@@ -588,6 +588,953 @@
                 Новогодняя Очередь
                 <span>🎄</span>
             </h1>
+            <p class="subtitle">Работает в реальном времени • Без регистрации • Для всех одногруппников</p>
+        </header>
+
+        <div class="main-content">
+            <!-- Отсчет до Нового года по Томску -->
+            <div class="new-year-countdown">
+                <div class="countdown-title">
+                    <i class="fas fa-clock"></i>
+                    До Нового 2025 года по томскому времени осталось:
+                </div>
+                <div class="countdown-timer" id="countdownTimer">
+                    <div class="countdown-unit">
+                        <div class="countdown-number" id="days">00</div>
+                        <div class="countdown-label">дней</div>
+                    </div>
+                    <div class="countdown-unit">
+                        <div class="countdown-number" id="hours">00</div>
+                        <div class="countdown-label">часов</div>
+                    </div>
+                    <div class="countdown-unit">
+                        <div class="countdown-number" id="minutes">00</div>
+                        <div class="countdown-label">минут</div>
+                    </div>
+                    <div class="countdown-unit">
+                        <div class="countdown-number" id="seconds">00</div>
+                        <div class="countdown-label">секунд</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <span id="statusText">🎄 Подключено к серверу • Новогоднее настроение активировано! 🎅</span>
+            </div>
+
+            <div class="card">
+                <h2><i class="fas fa-gift"></i> Добавить новый предмет</h2>
+                <div class="input-group">
+                    <label for="newSubject"><i class="fas fa-book"></i> Название предмета:</label>
+                    <input type="text" id="newSubject" placeholder="Например: Математика, Физика, Программирование...">
+                </div>
+                <button class="btn" onclick="addNewSubject()">
+                    <i class="fas fa-plus"></i> Добавить предмет
+                </button>
+            </div>
+
+            <div class="card">
+                <h2><i class="fas fa-user-plus"></i> Встать в очередь</h2>
+                <div class="input-group">
+                    <label for="selectSubject"><i class="fas fa-tree"></i> Выберите предмет:</label>
+                    <select id="selectSubject">
+                        <option value="">-- Выберите предмет --</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="userName"><i class="fas fa-snowman"></i> Ваше имя:</label>
+                    <input type="text" id="userName" placeholder="Введите ваше имя">
+                </div>
+                <button class="btn" onclick="addToQueue()">
+                    <i class="fas fa-sign-in-alt"></i> Встать в очередь
+                </button>
+            </div>
+
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-number" id="totalSubjects">0</div>
+                    <div class="stat-label">📚 Предметов</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="totalPeople">0</div>
+                    <div class="stat-label">👥 Людей в очередях</div>
+                </div>
+            </div>
+
+            <h2><i class="fas fa-list-ol"></i> Текущие новогодние очереди</h2>
+            <div id="queuesContainer">
+                <div class="empty-message">
+                    <i class="fas fa-inbox fa-3x" style="margin-bottom: 15px; color: #adb5bd;"></i>
+                    <h3>🎁 Очередей пока нет</h3>
+                    <p>Добавьте первый предмет, чтобы начать работу!</p>
+                    <p style="margin-top: 15px; font-size: 0.9em; color: #C62828;">
+                        <i class="fas fa-star"></i> С наступающим Новым Годом!
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p style="margin-top: 10px; font-size: 0.9em;">
+                <i class="fas fa-sync-alt"></i> Данные обновляются в реальном времени
+            </p>
+            <p style="margin-top: 15px; font-size: 0.8em; color: #666;">
+                Ссылка для одногруппников: <strong>https://scr4ffy.github.io/queue/</strong>
+            </p>
+        </footer>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    
+    <script>
+        // 🔧 Конфигурация Firebase
+        const firebaseConfig = {
+          apiKey: "AIzaSyBSGrGWgp_O3QTSF3PyXxjYC2nHo0UBi1U",
+          authDomain: "queue-20edb.firebaseapp.com",
+          databaseURL: "https://queue-20edb-default-rtdb.firebaseio.com",
+          projectId: "queue-20edb",
+          storageBucket: "queue-20edb.firebasestorage.app",
+          messagingSenderId: "744872622664",
+          appId: "1:744872622664:web:976d6da20e70a70978767d",
+          measurementId: "G-CNLRC5FY21"
+        };
+
+        // Инициализация Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Создаем снежинки
+        function createSnowflakes() {
+            const snowflakesContainer = document.getElementById('snowflakes');
+            const snowflakeEmojis = ['❄️', '✨', '⭐', '🌟', '💫'];
+            
+            for (let i = 0; i < 30; i++) {
+                const snowflake = document.createElement('div');
+                snowflake.className = 'snowflake';
+                snowflake.textContent = snowflakeEmojis[Math.floor(Math.random() * snowflakeEmojis.length)];
+                snowflake.style.left = Math.random() * 100 + 'vw';
+                snowflake.style.animationDuration = Math.random() * 10 + 10 + 's';
+                snowflake.style.animationDelay = Math.random() * 5 + 's';
+                snowflake.style.fontSize = Math.random() * 20 + 15 + 'px';
+                snowflakesContainer.appendChild(snowflake);
+            }
+        }
+
+        // Отсчет до Нового года по Томскому времени (UTC+7)
+        function updateCountdown() {
+            // Томское время (UTC+7)
+            const now = new Date();
+            const tomskOffset = 7 * 60; // UTC+7 в минутах
+            const tomskTime = new Date(now.getTime() + (tomskOffset + now.getTimezoneOffset()) * 60000);
+            
+            // Новый год 2025 по Томскому времени
+            const newYear = new Date(Date.UTC(2026, 0, 1, 0, 0, 0));
+            const newYearTomsk = new Date(newYear.getTime() - (7 * 60 * 60000));
+            
+            const diff = newYearTomsk - tomskTime;
+            
+            if (diff <= 0) {
+                document.getElementById('countdownTimer').innerHTML = 
+                    '<div style="font-size: 1.5em; padding: 20px;">🎉 С Новым 2026 Годом! 🥳</div>';
+                return;
+            }
+            
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            
+            document.getElementById('days').textContent = days.toString().padStart(2, '0');
+            document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+            document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+            document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+            
+            // Меняем цвет в последнюю минуту
+            if (days === 0 && hours === 0 && minutes < 1) {
+                document.querySelector('.new-year-countdown').style.animation = 'pulse 0.5s infinite';
+                document.querySelector('.new-year-countdown').style.background = 
+                    'linear-gradient(135deg, #FFD700 0%, #FF5722 100%)';
+            }
+        }
+
+        // Инициализация новогодних эффектов
+        document.addEventListener('DOMContentLoaded', function() {
+            createSnowflakes();
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+            
+            // Новогоднее поздравление при загрузке
+            setTimeout(() => {
+                alert("🎅 С наступающим Новым Годом! 🎄\nПусть ваша очередь будет короче, а оценки - выше! 🌟");
+            }, 1000);
+        });
+
+        // Остальной код остается без изменений
+        // Слушаем изменения в базе данных
+        database.ref('subjects').on('value', (snapshot) => {
+            const subjects = snapshot.val() || {};
+            renderAllQueues(subjects);
+            updateStats(subjects);
+            updateSubjectDropdown(subjects);
+        });
+
+        // Добавить новый предмет
+        function addNewSubject() {
+            const subjectName = document.getElementById('newSubject').value.trim();
+            if (!subjectName) {
+                alert('🎄 Введите название предмета!');
+                return;
+            }
+
+            const newSubjectRef = database.ref('subjects').push();
+            newSubjectRef.set({
+                name: subjectName,
+                queue: [],
+                createdAt: new Date().toISOString()
+            }).then(() => {
+                document.getElementById('newSubject').value = '';
+                alert(`🎁 Предмет "${subjectName}" добавлен!`);
+            });
+        }
+
+        // Встать в очередь
+        function addToQueue() {
+            const subjectId = document.getElementById('selectSubject').value;
+            const userName = document.getElementById('userName').value.trim();
+            
+            if (!subjectId) {
+                alert('🎄 Выберите предмет!');
+                return;
+            }
+            
+            if (!userName) {
+                alert('🎄 Введите ваше имя!');
+                return;
+            }
+            
+            const userRef = database.ref(`subjects/${subjectId}/queue`).push();
+            userRef.set({
+                name: userName,
+                timestamp: new Date().toISOString(),
+                addedAt: new Date().toLocaleString('ru-RU')
+            }).then(() => {
+                document.getElementById('userName').value = '';
+                alert(`🎅 ${userName}, вы в очереди! С наступающим! 🎄`);
+            });
+        }
+
+        // Завершить очередь для человека
+        function completeQueueItem(subjectId, queueId) {
+            if (confirm('🎁 Отметить как завершившего очередь?')) {
+                database.ref(`subjects/${subjectId}/queue/${queueId}`).remove();
+            }
+        }
+
+        // Удалить предмет
+        function deleteSubject(subjectId) {
+            if (confirm('❄️ Удалить этот предмет и всю очередь?')) {
+                database.ref(`subjects/${subjectId}`).remove();
+            }
+        }
+
+        // Обновить выпадающий список предметов
+        function updateSubjectDropdown(subjects) {
+            const select = document.getElementById('selectSubject');
+            select.innerHTML = '<option value="">-- Выберите предмет --</option>';
+            
+            Object.keys(subjects).forEach(subjectId => {
+                const option = document.createElement('option');
+                option.value = subjectId;
+                option.textContent = subjects[subjectId].name;
+                select.appendChild(option);
+            });
+        }
+
+        // Отобразить все очереди
+        function renderAllQueues(subjects) {
+            const container = document.getElementById('queuesContainer');
+            
+            if (Object.keys(subjects).length === 0) {
+                container.innerHTML = `
+                    <div class="empty-message">
+                        <i class="fas fa-inbox fa-3x" style="margin-bottom: 15px; color: #adb5bd;"></i>
+                        <h3>🎁 Очередей пока нет</h3>
+                        <p>Добавьте первый предмет, чтобы начать работу!</p>
+                        <p style="margin-top: 15px; font-size: 0.9em; color: #C62828;">
+                            <i class="fas fa-star"></i> С наступающим Новым Годом!
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = '';
+            
+            Object.keys(subjects).forEach(subjectId => {
+                const subject = subjects[subjectId];
+                const queue = subject.queue || {};
+                const queueArray = Object.keys(queue).map(key => ({
+                    id: key,
+                    ...queue[key]
+                }));
+                
+                const subjectCard = document.createElement('div');
+                subjectCard.className = 'subject-card';
+                
+                let queueHTML = '';
+                
+                if (queueArray.length === 0) {
+                    queueHTML = '<div class="empty-message" style="padding: 15px;">🎄 Очередь пуста</div>';
+                } else {
+                    queueArray.forEach((person, index) => {
+                        queueHTML += `
+                            <div class="queue-item ${index === 0 ? 'current' : ''}">
+                                <div style="display: flex; align-items: center;">
+                                    <div class="queue-number">${index + 1}</div>
+                                    <div class="queue-info">
+                                        <strong>${person.name}</strong>
+                                        <div class="queue-time">🎁 Добавлен: ${person.addedAt || 'только что'}</div>
+                                    </div>
+                                </div>
+                                <div class="queue-actions">
+                                    <button class="action-btn complete-btn" onclick="completeQueueItem('${subjectId}', '${person.id}')" title="Завершить">
+                                        <i class="fas fa-check-circle"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                
+                subjectCard.innerHTML = `
+                    <div class="subject-header">
+                        <div class="subject-title">
+                            <i class="fas fa-gift"></i> ${subject.name}
+                        </div>
+                        <button class="action-btn delete-btn" onclick="deleteSubject('${subjectId}')" title="Удалить предмет">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="queue-list">
+                        ${queueHTML}
+                    </div>
+                    <div style="margin-top: 15px; font-size: 0.9em; color: #C62828;">
+                        <i class="fas fa-users"></i> В очереди: ${queueArray.length} человек
+                        ${queueArray.length > 0 ? '🎅' : '🎄'}
+                    </div>
+                `;
+                
+                container.appendChild(subjectCard);
+            });
+        }
+
+        // Обновить статистику
+        function updateStats(subjects) {
+            let totalPeople = 0;
+            let totalSubjects = Object.keys(subjects).length;
+            
+            Object.values(subjects).forEach(subject => {
+                totalPeople += Object.keys(subject.queue || {}).length;
+            });
+            
+            document.getElementById('totalSubjects').textContent = totalSubjects;
+            document.getElementById('totalPeople').textContent = totalPeople;
+        }
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎄 Новогодняя очередь на парах</title>
+    <link rel="icon" href="logo.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "❄️";
+            position: fixed;
+            font-size: 24px;
+            color: white;
+            opacity: 0.7;
+            animation: snow 20s linear infinite;
+            z-index: -1;
+        }
+
+        body::after {
+            content: "🎄";
+            position: fixed;
+            font-size: 32px;
+            bottom: 50px;
+            right: 50px;
+            opacity: 0.3;
+            animation: pulse 3s infinite;
+            z-index: -1;
+        }
+
+        .snowflake {
+            position: fixed;
+            font-size: 20px;
+            color: white;
+            opacity: 0.8;
+            z-index: -1;
+            pointer-events: none;
+            animation: snowfall linear infinite;
+        }
+
+        @keyframes snowfall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes snow {
+            0% { transform: translateX(-100px); }
+            100% { transform: translateX(100vw); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .new-year-countdown {
+            background: linear-gradient(135deg, #C62828 0%, #F44336 100%);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 25px rgba(198, 40, 40, 0.3);
+            border: 3px solid #FFD700;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .new-year-countdown::before {
+            content: "✨";
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            animation: sparkle 1.5s infinite;
+        }
+
+        .new-year-countdown::after {
+            content: "✨";
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            animation: sparkle 1.5s infinite 0.5s;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0.3; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .countdown-title {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .countdown-timer {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            font-size: 2em;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+        }
+
+        .countdown-unit {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .countdown-number {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 15px;
+            border-radius: 10px;
+            min-width: 70px;
+            text-align: center;
+            border: 2px solid #FFD700;
+        }
+
+        .countdown-label {
+            font-size: 0.5em;
+            margin-top: 5px;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            .countdown-timer {
+                font-size: 1.5em;
+                gap: 10px;
+            }
+            .countdown-number {
+                min-width: 50px;
+                padding: 8px 10px;
+            }
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #ffffff 0%, #f5f7fa 100%);
+            border-radius: 25px;
+            box-shadow: 0 25px 70px rgba(0,0,0,0.3);
+            overflow: hidden;
+            border: 5px solid #4CAF50;
+            position: relative;
+        }
+
+        .container::before {
+            content: "🎁";
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 40px;
+            background: white;
+            padding: 10px;
+            border-radius: 50%;
+            border: 3px solid #FF5722;
+            z-index: 2;
+        }
+
+        header {
+            background: linear-gradient(135deg, #C62828 0%, #E53935 100%);
+            color: white;
+            padding: 40px 30px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: "❄️❄️❄️";
+            position: absolute;
+            top: 10px;
+            left: 0;
+            right: 0;
+            font-size: 24px;
+            opacity: 0.5;
+            animation: snowHeader 10s linear infinite;
+        }
+
+        @keyframes snowHeader {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        h1 {
+            font-size: 2.8em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.95;
+            font-weight: 500;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .card {
+            background: linear-gradient(135deg, #ffffff 0%, #f0f4ff 100%);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 3px solid #4CAF50;
+            box-shadow: 0 10px 25px rgba(76, 175, 80, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: "🎄";
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            opacity: 0.2;
+        }
+
+        h2 {
+            color: #C62828;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.6em;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #1a2980;
+            font-size: 1.1em;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 16px;
+            border: 3px solid #26d0ce;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: white;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        input:focus, select:focus {
+            border-color: #C62828;
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(198, 40, 40, 0.2);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #C62828 0%, #F44336 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 700;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 5px 15px rgba(198, 40, 40, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: 0.5s;
+        }
+
+        .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(198, 40, 40, 0.5);
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .subjects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+            margin-top: 25px;
+        }
+
+        .subject-card {
+            background: linear-gradient(135deg, #ffffff 0%, #e8f5e9 100%);
+            border-radius: 18px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            border: 3px solid #FFD700;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .subject-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            border-color: #C62828;
+        }
+
+        .subject-card::before {
+            content: "🌟";
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 20px;
+        }
+
+        .subject-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 3px dashed #4CAF50;
+        }
+
+        .subject-title {
+            font-size: 1.5em;
+            font-weight: 800;
+            color: #1a2980;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .queue-list {
+            margin-top: 20px;
+        }
+
+        .queue-item {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 5px solid #C62828;
+            transition: all 0.3s;
+        }
+
+        .queue-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .queue-item.current {
+            background: linear-gradient(135deg, #FFD700 0%, #FFC107 100%);
+            border-left-color: #4CAF50;
+            font-weight: bold;
+        }
+
+        .queue-number {
+            background: #C62828;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-right: 15px;
+            box-shadow: 0 3px 10px rgba(198, 40, 40, 0.4);
+        }
+
+        .queue-info {
+            flex-grow: 1;
+        }
+
+        .queue-time {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        .queue-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.4em;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover {
+            background: rgba(198, 40, 40, 0.1);
+            transform: scale(1.2);
+        }
+
+        .complete-btn {
+            color: #4CAF50;
+        }
+
+        .delete-btn {
+            color: #F44336;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 40px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e3e9f7 100%);
+            border-radius: 15px;
+            margin: 30px 0;
+            border: 3px dashed #26d0ce;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 20px;
+            margin: 40px 0;
+            border: 4px solid #FFD700;
+            box-shadow: 0 10px 30px rgba(26, 41, 128, 0.3);
+            position: relative;
+        }
+
+        .stats::before {
+            content: "🎯";
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 40px;
+            background: white;
+            padding: 10px;
+            border-radius: 50%;
+            border: 3px solid #FFD700;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 3em;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .stat-label {
+            font-size: 1.1em;
+            opacity: 0.95;
+            margin-top: 10px;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 3px solid #2196F3;
+        }
+
+        .status-dot {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #4CAF50;
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 10px #4CAF50;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #1a2980;
+            border-top: 3px solid #FFD700;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e3e9f7 100%);
+            position: relative;
+        }
+
+        footer::before {
+            content: "🎅 С наступающим Новым Годом! 🎄";
+            display: block;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #C62828;
+            margin-bottom: 10px;
+            animation: colorChange 3s infinite;
+        }
+
+        @keyframes colorChange {
+            0%, 100% { color: #C62828; }
+            50% { color: #4CAF50; }
+        }
+
+        @media (max-width: 768px) {
+            .subjects-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats {
+                flex-direction: column;
+                gap: 25px;
+            }
+            
+            h1 {
+                font-size: 2em;
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Снежинки -->
+    <div id="snowflakes"></div>
+
+    <div class="container">
+        <header>
+            <h1>
+                <span>🎅</span>
+                Новогодняя Очередь
+                <span>🎄</span>
+            </h1>
         </header>
 
         <div class="main-content">
@@ -729,7 +1676,7 @@
             const tomskTime = new Date(now.getTime() + (tomskOffset + now.getTimezoneOffset()) * 60000);
             
             // Новый год 2025 по Томскому времени
-            const newYear = new Date(Date.UTC(2025, 0, 1, 0, 0, 0));
+            const newYear = new Date(Date.UTC(2026, 0, 1, 0, 0, 0));
             const newYearTomsk = new Date(newYear.getTime() - (7 * 60 * 60000));
             
             const diff = newYearTomsk - tomskTime;
