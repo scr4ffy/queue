@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Сайт для очереди на парах</title>
+    <title>🎄 Новогодняя очередь на парах</title>
     <link rel="icon" href="logo.png" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -13,209 +13,222 @@
             padding: 0;
         }
 
-        :root {
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --primary-color: #667eea;
-            --secondary-color: #764ba2;
-            --bg-color: #ffffff;
-            --card-bg: #f8f9fa;
-            --text-color: #333333;
-            --border-color: #dee2e6;
-            --shadow-color: rgba(0, 0, 0, 0.1);
-            --queue-item-bg: #f8f9fa;
-            --current-queue-bg: #e3f2fd;
-            --footer-bg: #f8f9fa;
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
         }
 
-        .dark-mode {
-            --primary-gradient: linear-gradient(135deg, #7c93f5 0%, #9a6bd1 100%);
-            --primary-color: #7c93f5;
-            --secondary-color: #9a6bd1;
-            --bg-color: #1a1a2e;
-            --card-bg: #16213e;
-            --text-color: #e6e6e6;
-            --border-color: #2d3748;
-            --shadow-color: rgba(0, 0, 0, 0.3);
-            --queue-item-bg: #0f3460;
-            --current-queue-bg: #1e3a5f;
-            --footer-bg: #16213e;
+        body::before {
+            content: "❄️";
+            position: fixed;
+            font-size: 24px;
+            color: white;
+            opacity: 0.7;
+            animation: snow 20s linear infinite;
+            z-index: -1;
         }
 
-        .cheese-mode {
-            --primary-gradient: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-            --primary-color: #FFD700;
-            --secondary-color: #FFA500;
-            --bg-color: #FFF8DC;
-            --card-bg: #FFEBCD;
-            --text-color: #8B4513;
-            --border-color: #D2691E;
-            --shadow-color: rgba(139, 69, 19, 0.2);
-            --queue-item-bg: #FAEBD7;
-            --current-queue-bg: #FFE4B5;
-            --footer-bg: #FFEBCD;
+        body::after {
+            content: "🎄";
+            position: fixed;
+            font-size: 32px;
+            bottom: 50px;
+            right: 50px;
+            opacity: 0.3;
+            animation: pulse 3s infinite;
+            z-index: -1;
         }
 
-        .cheese-mode header {
-            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23FFD700' fill-opacity='0.3' fill-rule='evenodd'/%3E%3C/svg%3E");
+        .snowflake {
+            position: fixed;
+            font-size: 20px;
+            color: white;
+            opacity: 0.8;
+            z-index: -1;
+            pointer-events: none;
+            animation: snowfall linear infinite;
+        }
+
+        @keyframes snowfall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes snow {
+            0% { transform: translateX(-100px); }
+            100% { transform: translateX(100vw); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .new-year-countdown {
+            background: linear-gradient(135deg, #C62828 0%, #F44336 100%);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 25px rgba(198, 40, 40, 0.3);
+            border: 3px solid #FFD700;
             position: relative;
             overflow: hidden;
         }
 
-        .cheese-mode header::before {
-            content: "🧀";
+        .new-year-countdown::before {
+            content: "✨";
             position: absolute;
+            top: 10px;
+            left: 10px;
+            animation: sparkle 1.5s infinite;
+        }
+
+        .new-year-countdown::after {
+            content: "✨";
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            animation: sparkle 1.5s infinite 0.5s;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0.3; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .countdown-title {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .countdown-timer {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
             font-size: 2em;
-            animation: floatCheese 15s linear infinite;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
         }
 
-        .cheese-mode header::after {
-            content: "🧀";
-            position: absolute;
-            font-size: 1.5em;
-            top: 20%;
-            right: 15%;
-            animation: floatCheese 20s linear infinite reverse;
+        .countdown-unit {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        @keyframes floatCheese {
-            0% { transform: translateX(-100px) rotate(0deg); }
-            100% { transform: translateX(calc(100vw + 100px)) rotate(360deg); }
+        .countdown-number {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 15px;
+            border-radius: 10px;
+            min-width: 70px;
+            text-align: center;
+            border: 2px solid #FFD700;
         }
 
-        .cheese-mode .status-dot {
-            background: #FFA500;
+        .countdown-label {
+            font-size: 0.5em;
+            margin-top: 5px;
+            opacity: 0.9;
         }
 
-        .cheese-mode .queue-item {
-            border-left: 4px solid #FFD700;
-        }
-
-        .cheese-mode .queue-item.current {
-            border-left-color: #FF8C00;
-        }
-
-        .cheese-mode .queue-number {
-            background: #FFD700;
-            color: #8B4513;
-        }
-
-        .cheese-mode .complete-btn {
-            color: #D2691E;
-        }
-
-        .cheese-mode .subject-card:hover {
-            border-color: #FFA500;
-            box-shadow: 0 5px 15px rgba(255, 165, 0, 0.3);
-        }
-
-        .cheese-mode input:focus,
-        .cheese-mode select:focus {
-            border-color: #FFA500;
-            box-shadow: 0 0 0 3px rgba(255, 165, 0, 0.2);
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--primary-gradient);
-            min-height: 100vh;
-            padding: 20px;
-            color: var(--text-color);
-            transition: background 0.3s, color 0.3s;
+        @media (max-width: 768px) {
+            .countdown-timer {
+                font-size: 1.5em;
+                gap: 10px;
+            }
+            .countdown-number {
+                min-width: 50px;
+                padding: 8px 10px;
+            }
         }
 
         .container {
             max-width: 900px;
             margin: 0 auto;
-            background: var(--bg-color);
-            border-radius: 20px;
-            box-shadow: 0 20px 60px var(--shadow-color);
+            background: linear-gradient(135deg, #ffffff 0%, #f5f7fa 100%);
+            border-radius: 25px;
+            box-shadow: 0 25px 70px rgba(0,0,0,0.3);
             overflow: hidden;
-            transition: background 0.3s;
-        }
-
-        header {
-            background: var(--primary-gradient);
-            color: white;
-            padding: 30px;
-            text-align: center;
+            border: 5px solid #4CAF50;
             position: relative;
         }
 
+        .container::before {
+            content: "🎁";
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 40px;
+            background: white;
+            padding: 10px;
+            border-radius: 50%;
+            border: 3px solid #FF5722;
+            z-index: 2;
+        }
+
+        header {
+            background: linear-gradient(135deg, #C62828 0%, #E53935 100%);
+            color: white;
+            padding: 40px 30px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: "❄️❄️❄️";
+            position: absolute;
+            top: 10px;
+            left: 0;
+            right: 0;
+            font-size: 24px;
+            opacity: 0.5;
+            animation: snowHeader 10s linear infinite;
+        }
+
+        @keyframes snowHeader {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
         h1 {
-            font-size: 2.5em;
+            font-size: 2.8em;
             margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
         }
 
         .subtitle {
-            font-size: 1.1em;
-            opacity: 0.9;
-        }
-
-        .theme-toggle {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5em;
-            color: white;
-            transition: all 0.3s;
-        }
-
-        .theme-toggle:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: scale(1.1);
-        }
-
-        .easter-egg-indicator {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5em;
-            color: white;
-            transition: all 0.3s;
-            opacity: 0.1;
-        }
-
-        .easter-egg-indicator:hover {
-            opacity: 1;
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        .cheese-notification {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #FFD700;
-            color: #8B4513;
-            padding: 15px 20px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(139, 69, 19, 0.3);
-            display: none;
-            z-index: 1000;
-            animation: slideIn 0.5s ease-out;
-            font-weight: bold;
-        }
-
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+            font-size: 1.2em;
+            opacity: 0.95;
+            font-weight: 500;
         }
 
         .main-content {
@@ -223,21 +236,32 @@
         }
 
         .card {
-            background: var(--card-bg);
-            border-radius: 15px;
+            background: linear-gradient(135deg, #ffffff 0%, #f0f4ff 100%);
+            border-radius: 20px;
             padding: 25px;
             margin-bottom: 25px;
-            border: 1px solid var(--border-color);
-            transition: background 0.3s, border-color 0.3s;
+            border: 3px solid #4CAF50;
+            box-shadow: 0 10px 25px rgba(76, 175, 80, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: "🎄";
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            opacity: 0.2;
         }
 
         h2 {
-            color: var(--text-color);
+            color: #C62828;
             margin-bottom: 20px;
             display: flex;
             align-items: center;
-            gap: 10px;
-            transition: color 0.3s;
+            gap: 15px;
+            font-size: 1.6em;
         }
 
         .input-group {
@@ -246,122 +270,157 @@
 
         label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             font-weight: 600;
-            color: var(--text-color);
-            transition: color 0.3s;
+            color: #1a2980;
+            font-size: 1.1em;
         }
 
         input, select {
             width: 100%;
-            padding: 14px;
-            border: 2px solid var(--border-color);
-            border-radius: 10px;
+            padding: 16px;
+            border: 3px solid #26d0ce;
+            border-radius: 12px;
             font-size: 16px;
             transition: all 0.3s;
-            background: var(--bg-color);
-            color: var(--text-color);
+            background: white;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
         }
 
         input:focus, select:focus {
-            border-color: var(--primary-color);
+            border-color: #C62828;
             outline: none;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            box-shadow: 0 0 0 4px rgba(198, 40, 40, 0.2);
         }
 
         .btn {
-            background: var(--primary-gradient);
+            background: linear-gradient(135deg, #C62828 0%, #F44336 100%);
             color: white;
             border: none;
-            padding: 14px 28px;
-            border-radius: 10px;
+            padding: 16px 32px;
+            border-radius: 12px;
             cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            transition: transform 0.2s, box-shadow 0.2s;
+            font-size: 18px;
+            font-weight: 700;
+            transition: all 0.3s;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
+            box-shadow: 0 5px 15px rgba(198, 40, 40, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: 0.5s;
         }
 
         .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 7px 20px rgba(102, 126, 234, 0.3);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(198, 40, 40, 0.5);
         }
 
-        .cheese-mode .btn:hover {
-            box-shadow: 0 7px 20px rgba(255, 165, 0, 0.3);
+        .btn:hover::before {
+            left: 100%;
         }
 
         .subjects-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+            margin-top: 25px;
         }
 
         .subject-card {
-            background: var(--bg-color);
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 5px 15px var(--shadow-color);
-            border: 2px solid var(--border-color);
-            transition: transform 0.3s, background 0.3s, border-color 0.3s;
+            background: linear-gradient(135deg, #ffffff 0%, #e8f5e9 100%);
+            border-radius: 18px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            border: 3px solid #FFD700;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
         }
 
         .subject-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--primary-color);
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            border-color: #C62828;
+        }
+
+        .subject-card::before {
+            content: "🌟";
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 20px;
         }
 
         .subject-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 3px dashed #4CAF50;
         }
 
         .subject-title {
-            font-size: 1.4em;
-            font-weight: 700;
-            color: var(--text-color);
+            font-size: 1.5em;
+            font-weight: 800;
+            color: #1a2980;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .queue-list {
-            margin-top: 15px;
+            margin-top: 20px;
         }
 
         .queue-item {
-            background: var(--queue-item-bg);
-            padding: 12px 15px;
-            margin: 8px 0;
-            border-radius: 8px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-left: 4px solid var(--primary-color);
-            transition: background 0.3s;
+            border-left: 5px solid #C62828;
+            transition: all 0.3s;
+        }
+
+        .queue-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
         .queue-item.current {
-            background: var(--current-queue-bg);
-            border-left-color: #00b894;
+            background: linear-gradient(135deg, #FFD700 0%, #FFC107 100%);
+            border-left-color: #4CAF50;
             font-weight: bold;
         }
 
         .queue-number {
-            background: var(--primary-color);
+            background: #C62828;
             color: white;
-            width: 32px;
-            height: 32px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            margin-right: 12px;
+            font-size: 1.2em;
+            margin-right: 15px;
+            box-shadow: 0 3px 10px rgba(198, 40, 40, 0.4);
         }
 
         .queue-info {
@@ -369,72 +428,75 @@
         }
 
         .queue-time {
-            font-size: 0.8em;
-            color: #6c757d;
-            margin-top: 4px;
-        }
-
-        .dark-mode .queue-time,
-        .cheese-mode .queue-time {
-            color: #a0aec0;
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+            font-style: italic;
         }
 
         .queue-actions {
             display: flex;
-            gap: 8px;
+            gap: 10px;
         }
 
         .action-btn {
             background: none;
             border: none;
             cursor: pointer;
-            font-size: 1.2em;
-            padding: 5px;
-            border-radius: 5px;
-            transition: background 0.2s;
-            color: var(--text-color);
+            font-size: 1.4em;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.3s;
         }
 
         .action-btn:hover {
-            background: rgba(0,0,0,0.05);
-        }
-
-        .dark-mode .action-btn:hover,
-        .cheese-mode .action-btn:hover {
-            background: rgba(255,255,255,0.1);
+            background: rgba(198, 40, 40, 0.1);
+            transform: scale(1.2);
         }
 
         .complete-btn {
-            color: #00b894;
+            color: #4CAF50;
         }
 
         .delete-btn {
-            color: #e74c3c;
+            color: #F44336;
         }
 
         .empty-message {
             text-align: center;
-            color: #6c757d;
+            color: #666;
             font-style: italic;
-            padding: 30px;
-            background: var(--card-bg);
-            border-radius: 10px;
-            margin: 20px 0;
-        }
-
-        .dark-mode .empty-message,
-        .cheese-mode .empty-message {
-            color: #a0aec0;
+            padding: 40px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e3e9f7 100%);
+            border-radius: 15px;
+            margin: 30px 0;
+            border: 3px dashed #26d0ce;
         }
 
         .stats {
             display: flex;
             justify-content: space-around;
-            background: var(--primary-gradient);
+            background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
             color: white;
-            padding: 20px;
-            border-radius: 15px;
-            margin: 30px 0;
+            padding: 25px;
+            border-radius: 20px;
+            margin: 40px 0;
+            border: 4px solid #FFD700;
+            box-shadow: 0 10px 30px rgba(26, 41, 128, 0.3);
+            position: relative;
+        }
+
+        .stats::before {
+            content: "🎯";
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 40px;
+            background: white;
+            padding: 10px;
+            border-radius: 50%;
+            border: 3px solid #FFD700;
         }
 
         .stat-item {
@@ -442,38 +504,59 @@
         }
 
         .stat-number {
-            font-size: 2.5em;
+            font-size: 3em;
             font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
 
         .stat-label {
-            font-size: 0.9em;
-            opacity: 0.9;
+            font-size: 1.1em;
+            opacity: 0.95;
+            margin-top: 10px;
         }
 
         .status-indicator {
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 10px 15px;
-            background: var(--card-bg);
-            border-radius: 10px;
-            margin-bottom: 20px;
-            border: 1px solid var(--border-color);
+            gap: 15px;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 3px solid #2196F3;
         }
 
         .status-dot {
-            width: 12px;
-            height: 12px;
+            width: 15px;
+            height: 15px;
             border-radius: 50%;
-            background: #00b894;
+            background: #4CAF50;
             animation: pulse 2s infinite;
+            box-shadow: 0 0 10px #4CAF50;
         }
 
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #1a2980;
+            border-top: 3px solid #FFD700;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e3e9f7 100%);
+            position: relative;
+        }
+
+        footer::before {
+            content: "🎅 С наступающим Новым Годом! 🎄";
+            display: block;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #C62828;
+            margin-bottom: 10px;
+            animation: colorChange 3s infinite;
+        }
+
+        @keyframes colorChange {
+            0%, 100% { color: #C62828; }
+            50% { color: #4CAF50; }
         }
 
         @media (max-width: 768px) {
@@ -483,59 +566,66 @@
             
             .stats {
                 flex-direction: column;
-                gap: 20px;
+                gap: 25px;
             }
             
-            .theme-toggle,
-            .easter-egg-indicator {
-                top: 15px;
-                right: 15px;
-                width: 40px;
-                height: 40px;
-                font-size: 1.2em;
+            h1 {
+                font-size: 2em;
+                flex-direction: column;
+                gap: 10px;
             }
-            
-            .easter-egg-indicator {
-                left: 15px;
-            }
-        }
-
-        footer {
-            text-align: center;
-            padding: 20px;
-            color: var(--text-color);
-            border-top: 1px solid var(--border-color);
-            background: var(--footer-bg);
-            transition: background 0.3s, color 0.3s;
         }
     </style>
 </head>
 <body>
-    <div class="cheese-notification" id="cheeseNotification">
-        🧀 Сырная тема активирована! 🧀
-    </div>
+    <!-- Снежинки -->
+    <div id="snowflakes"></div>
 
     <div class="container">
         <header>
-            <button class="theme-toggle" id="themeToggle" title="Переключить тему">
-                <i class="fas fa-moon"></i>
-            </button>
-            <button class="easter-egg-indicator" id="easterEggIndicator" title="Секретная кнопка...">
-                ?
-            </button>
-            <h1><i class="fas fa-users"></i> Онлайн Очередь</h1>
+            <h1>
+                <span>🎅</span>
+                Новогодняя Очередь
+                <span>🎄</span>
+            </h1>
         </header>
 
         <div class="main-content">
+            <!-- Отсчет до Нового года -->
+            <div class="new-year-countdown">
+                <div class="countdown-title">
+                    <i class="fas fa-clock"></i>
+                    До Нового 2026 года осталось:
+                </div>
+                <div class="countdown-timer" id="countdownTimer">
+                    <div class="countdown-unit">
+                        <div class="countdown-number" id="days">00</div>
+                        <div class="countdown-label">дней</div>
+                    </div>
+                    <div class="countdown-unit">
+                        <div class="countdown-number" id="hours">00</div>
+                        <div class="countdown-label">часов</div>
+                    </div>
+                    <div class="countdown-unit">
+                        <div class="countdown-number" id="minutes">00</div>
+                        <div class="countdown-label">минут</div>
+                    </div>
+                    <div class="countdown-unit">
+                        <div class="countdown-number" id="seconds">00</div>
+                        <div class="countdown-label">секунд</div>
+                    </div>
+                </div>
+            </div>
+
             <div class="status-indicator">
                 <div class="status-dot"></div>
-                <span id="statusText">Подключено к серверу ✓</span>
+                <span id="statusText">🎄 Подключено к серверу • Новогоднее настроение активировано! 🎅</span>
             </div>
 
             <div class="card">
-                <h2><i class="fas fa-plus-circle"></i> Добавить новый предмет</h2>
+                <h2><i class="fas fa-gift"></i> Добавить новый предмет</h2>
                 <div class="input-group">
-                    <label for="newSubject">Название предмета:</label>
+                    <label for="newSubject"><i class="fas fa-book"></i> Название предмета:</label>
                     <input type="text" id="newSubject" placeholder="Например: Математика, Физика, Программирование...">
                 </div>
                 <button class="btn" onclick="addNewSubject()">
@@ -546,13 +636,13 @@
             <div class="card">
                 <h2><i class="fas fa-user-plus"></i> Встать в очередь</h2>
                 <div class="input-group">
-                    <label for="selectSubject">Выберите предмет:</label>
+                    <label for="selectSubject"><i class="fas fa-tree"></i> Выберите предмет:</label>
                     <select id="selectSubject">
                         <option value="">-- Выберите предмет --</option>
                     </select>
                 </div>
                 <div class="input-group">
-                    <label for="userName">Ваше имя:</label>
+                    <label for="userName"><i class="fas fa-snowman"></i> Ваше имя:</label>
                     <input type="text" id="userName" placeholder="Введите ваше имя">
                 </div>
                 <button class="btn" onclick="addToQueue()">
@@ -563,20 +653,23 @@
             <div class="stats">
                 <div class="stat-item">
                     <div class="stat-number" id="totalSubjects">0</div>
-                    <div class="stat-label">Предметов</div>
+                    <div class="stat-label">📚 Предметов</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-number" id="totalPeople">0</div>
-                    <div class="stat-label">Людей в очередях</div>
+                    <div class="stat-label">👥 Людей в очередях</div>
                 </div>
             </div>
 
-            <h2><i class="fas fa-list-ol"></i> Текущие очереди</h2>
+            <h2><i class="fas fa-list-ol"></i> Текущие новогодние очереди</h2>
             <div id="queuesContainer">
                 <div class="empty-message">
                     <i class="fas fa-inbox fa-3x" style="margin-bottom: 15px; color: #adb5bd;"></i>
-                    <h3>Очередей пока нет</h3>
-                    <p>Добавьте первый предмет, чтобы начать работу</p>
+                    <h3>🎁 Очередей пока нет</h3>
+                    <p>Добавьте первый предмет, чтобы начать работу!</p>
+                    <p style="margin-top: 15px; font-size: 0.9em; color: #C62828;">
+                        <i class="fas fa-star"></i> С наступающим Новым Годом!
+                    </p>
                 </div>
             </div>
         </div>
@@ -584,6 +677,8 @@
         <footer>
             <p style="margin-top: 10px; font-size: 0.9em;">
                 <i class="fas fa-sync-alt"></i> Данные обновляются в реальном времени
+            </p>
+            <p style="margin-top: 15px; font-size: 0.8em; color: #666;">
             </p>
         </footer>
     </div>
@@ -609,99 +704,70 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // Управление темами
-        const themeToggle = document.getElementById('themeToggle');
-        const easterEggIndicator = document.getElementById('easterEggIndicator');
-        const cheeseNotification = document.getElementById('cheeseNotification');
-        const htmlElement = document.documentElement;
-
-        // Переменные для пасхалки
-        let cheeseClickCount = 0;
-        let cheeseTimer = null;
-
-        // Проверяем сохраненную тему
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'dark') {
-            htmlElement.classList.add('dark-mode');
-            themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-        } else if (savedTheme === 'cheese') {
-            htmlElement.classList.add('cheese-mode');
-            themeToggle.innerHTML = '<i class="fas fa-cheese"></i>';
-            showCheeseNotification();
-        }
-
-        // Обработчик пасхалки
-        easterEggIndicator.addEventListener('click', () => {
-            cheeseClickCount++;
+        // Создаем снежинки
+        function createSnowflakes() {
+            const snowflakesContainer = document.getElementById('snowflakes');
+            const snowflakeEmojis = ['❄️', '✨', '⭐', '🌟', '💫'];
             
-            if (cheeseClickCount === 1) {
-                // Первый клик - меняем иконку
-                easterEggIndicator.innerHTML = '🧀';
-                easterEggIndicator.title = 'Продолжай...';
-                
-                // Запускаем таймер сброса
-                cheeseTimer = setTimeout(() => {
-                    cheeseClickCount = 0;
-                    easterEggIndicator.innerHTML = '?';
-                    easterEggIndicator.title = 'Секретная кнопка...';
-                }, 3000);
-            } else if (cheeseClickCount === 3) {
-                // Третий клик - активируем сырную тему
-                clearTimeout(cheeseTimer);
-                activateCheeseTheme();
-                cheeseClickCount = 0;
-                easterEggIndicator.innerHTML = '?';
-                easterEggIndicator.title = 'Секретная кнопка...';
+            for (let i = 0; i < 30; i++) {
+                const snowflake = document.createElement('div');
+                snowflake.className = 'snowflake';
+                snowflake.textContent = snowflakeEmojis[Math.floor(Math.random() * snowflakeEmojis.length)];
+                snowflake.style.left = Math.random() * 100 + 'vw';
+                snowflake.style.animationDuration = Math.random() * 10 + 10 + 's';
+                snowflake.style.animationDelay = Math.random() * 5 + 's';
+                snowflake.style.fontSize = Math.random() * 20 + 15 + 'px';
+                snowflakesContainer.appendChild(snowflake);
             }
-        });
-
-        // Активация сырной темы
-        function activateCheeseTheme() {
-            htmlElement.classList.remove('dark-mode');
-            htmlElement.classList.add('cheese-mode');
-            localStorage.setItem('theme', 'cheese');
-            themeToggle.innerHTML = '<i class="fas fa-cheese"></i>';
-            themeToggle.title = 'Переключить на обычную тему';
-            
-            showCheeseNotification();
-            
-            // Добавляем звуковой эффект (опционально)
-            try {
-                const audio = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEAQB8AAEAfAAABAAgAZGF0YQ');
-                audio.volume = 0.3;
-                audio.play();
-            } catch (e) {}
         }
 
-        // Показ уведомления
-        function showCheeseNotification() {
-            cheeseNotification.style.display = 'block';
+        // Отсчет до Нового года по Томскому времени (UTC+7)
+        function updateCountdown() {
+            // Томское время (UTC+7)
+            const now = new Date();
+            const tomskOffset = 7 * 60; // UTC+7 в минутах
+            const tomskTime = new Date(now.getTime() + (tomskOffset + now.getTimezoneOffset()) * 60000);
+            
+            // Новый год 2025 по Томскому времени
+            const newYear = new Date(Date.UTC(2025, 0, 1, 0, 0, 0));
+            const newYearTomsk = new Date(newYear.getTime() - (7 * 60 * 60000));
+            
+            const diff = newYearTomsk - tomskTime;
+            
+            if (diff <= 0) {
+                document.getElementById('countdownTimer').innerHTML = 
+                    '<div style="font-size: 1.5em; padding: 20px;">🎉 С Новым 2026 Годом! 🥳</div>';
+                return;
+            }
+            
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            
+            document.getElementById('days').textContent = days.toString().padStart(2, '0');
+            document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+            document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+            document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+            
+            // Меняем цвет в последнюю минуту
+            if (days === 0 && hours === 0 && minutes < 1) {
+                document.querySelector('.new-year-countdown').style.animation = 'pulse 0.5s infinite';
+                document.querySelector('.new-year-countdown').style.background = 
+                    'linear-gradient(135deg, #FFD700 0%, #FF5722 100%)';
+            }
+        }
+
+        // Инициализация новогодних эффектов
+        document.addEventListener('DOMContentLoaded', function() {
+            createSnowflakes();
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+            
+            // Новогоднее поздравление при загрузке
             setTimeout(() => {
-                cheeseNotification.style.display = 'none';
-            }, 3000);
-        }
-
-        // Переключение темы
-        themeToggle.addEventListener('click', () => {
-            if (htmlElement.classList.contains('dark-mode')) {
-                // С темной на светлую
-                htmlElement.classList.remove('dark-mode');
-                localStorage.setItem('theme', 'light');
-                themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-                themeToggle.title = 'Переключить на темную тему';
-            } else if (htmlElement.classList.contains('cheese-mode')) {
-                // С сырной на светлую
-                htmlElement.classList.remove('cheese-mode');
-                localStorage.setItem('theme', 'light');
-                themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-                themeToggle.title = 'Переключить на темную тему';
-            } else {
-                // Со светлой на темную
-                htmlElement.classList.add('dark-mode');
-                localStorage.setItem('theme', 'dark');
-                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-                themeToggle.title = 'Переключить на светлую тему';
-            }
+                alert("🎅 С наступающим Новым Годом! 🎄\nПусть ваша очередь будет короче, а оценки - выше! 🌟");
+            }, 1000);
         });
 
         // Остальной код остается без изменений
@@ -717,7 +783,7 @@
         function addNewSubject() {
             const subjectName = document.getElementById('newSubject').value.trim();
             if (!subjectName) {
-                alert('Введите название предмета');
+                alert('🎄 Введите название предмета!');
                 return;
             }
 
@@ -728,7 +794,7 @@
                 createdAt: new Date().toISOString()
             }).then(() => {
                 document.getElementById('newSubject').value = '';
-                alert(`Предмет "${subjectName}" добавлен!`);
+                alert(`🎁 Предмет "${subjectName}" добавлен!`);
             });
         }
 
@@ -738,12 +804,12 @@
             const userName = document.getElementById('userName').value.trim();
             
             if (!subjectId) {
-                alert('Выберите предмет');
+                alert('🎄 Выберите предмет!');
                 return;
             }
             
             if (!userName) {
-                alert('Введите ваше имя');
+                alert('🎄 Введите ваше имя!');
                 return;
             }
             
@@ -754,20 +820,20 @@
                 addedAt: new Date().toLocaleString('ru-RU')
             }).then(() => {
                 document.getElementById('userName').value = '';
-                alert(`${userName}, вы в очереди!`);
+                alert(`🎅 ${userName}, вы в очереди! С наступающим! 🎄`);
             });
         }
 
         // Завершить очередь для человека
         function completeQueueItem(subjectId, queueId) {
-            if (confirm('Отметить как завершившего очередь?')) {
+            if (confirm('🎁 Отметить как завершившего очередь?')) {
                 database.ref(`subjects/${subjectId}/queue/${queueId}`).remove();
             }
         }
 
         // Удалить предмет
         function deleteSubject(subjectId) {
-            if (confirm('Удалить этот предмет и всю очередь?')) {
+            if (confirm('❄️ Удалить этот предмет и всю очередь?')) {
                 database.ref(`subjects/${subjectId}`).remove();
             }
         }
@@ -793,8 +859,11 @@
                 container.innerHTML = `
                     <div class="empty-message">
                         <i class="fas fa-inbox fa-3x" style="margin-bottom: 15px; color: #adb5bd;"></i>
-                        <h3>Очередей пока нет</h3>
-                        <p>Добавьте первый предмет, чтобы начать работу</p>
+                        <h3>🎁 Очередей пока нет</h3>
+                        <p>Добавьте первый предмет, чтобы начать работу!</p>
+                        <p style="margin-top: 15px; font-size: 0.9em; color: #C62828;">
+                            <i class="fas fa-star"></i> С наступающим Новым Годом!
+                        </p>
                     </div>
                 `;
                 return;
@@ -816,7 +885,7 @@
                 let queueHTML = '';
                 
                 if (queueArray.length === 0) {
-                    queueHTML = '<div class="empty-message" style="padding: 15px;">Очередь пуста</div>';
+                    queueHTML = '<div class="empty-message" style="padding: 15px;">🎄 Очередь пуста</div>';
                 } else {
                     queueArray.forEach((person, index) => {
                         queueHTML += `
@@ -825,7 +894,7 @@
                                     <div class="queue-number">${index + 1}</div>
                                     <div class="queue-info">
                                         <strong>${person.name}</strong>
-                                        <div class="queue-time">Добавлен: ${person.addedAt || 'только что'}</div>
+                                        <div class="queue-time">🎁 Добавлен: ${person.addedAt || 'только что'}</div>
                                     </div>
                                 </div>
                                 <div class="queue-actions">
@@ -841,7 +910,7 @@
                 subjectCard.innerHTML = `
                     <div class="subject-header">
                         <div class="subject-title">
-                            <i class="fas fa-book"></i> ${subject.name}
+                            <i class="fas fa-gift"></i> ${subject.name}
                         </div>
                         <button class="action-btn delete-btn" onclick="deleteSubject('${subjectId}')" title="Удалить предмет">
                             <i class="fas fa-trash"></i>
@@ -850,8 +919,9 @@
                     <div class="queue-list">
                         ${queueHTML}
                     </div>
-                    <div style="margin-top: 15px; font-size: 0.9em; color: #6c757d;">
+                    <div style="margin-top: 15px; font-size: 0.9em; color: #C62828;">
                         <i class="fas fa-users"></i> В очереди: ${queueArray.length} человек
+                        ${queueArray.length > 0 ? '🎅' : '🎄'}
                     </div>
                 `;
                 
