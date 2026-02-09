@@ -116,6 +116,10 @@
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
         }
 
+        .btn-list {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
         .subjects-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -305,6 +309,11 @@
     <div class="container">
         <header>
             <h1><i class="fas fa-users"></i> Онлайн Очередь</h1>
+            <div style="margin-top: 15px;">
+                <button onclick="goToLists()" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 10px 20px; border-radius: 50px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; font-size: 16px;">
+                    <i class="fas fa-list-check"></i> Перейти к спискам
+                </button>
+            </div>
         </header>
 
         <div class="main-content">
@@ -349,6 +358,10 @@
                 <div class="stat-item">
                     <div class="stat-number" id="totalPeople">0</div>
                     <div class="stat-label">Людей в очередях</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="totalLists">0</div>
+                    <div class="stat-label">Списков</div>
                 </div>
             </div>
 
@@ -395,6 +408,12 @@
             renderAllQueues(subjects);
             updateStats(subjects);
             updateSubjectDropdown(subjects);
+        });
+
+        // Слушаем изменения в списках для статистики
+        database.ref('lists').on('value', (snapshot) => {
+            const lists = snapshot.val() || {};
+            updateListsStats(lists);
         });
 
         // Добавить новый предмет
@@ -454,6 +473,30 @@
             if (confirm('Удалить этот предмет и всю очередь?')) {
                 database.ref(`subjects/${subjectId}`).remove();
             }
+        }
+
+        // Создать новый список
+        function createNewList() {
+            const listName = document.getElementById('listName').value.trim();
+            if (!listName) {
+                alert('Введите название списка');
+                return;
+            }
+
+            const newListRef = database.ref('lists').push();
+            newListRef.set({
+                name: listName,
+                items: {},
+                createdAt: new Date().toISOString()
+            }).then(() => {
+                document.getElementById('listName').value = '';
+                alert(`Список "${listName}" создан!`);
+            });
+        }
+
+        // Перейти к спискам
+        function goToLists() {
+            window.location.href = 'list.html';
         }
 
         // Обновить выпадающий список предметов
@@ -554,6 +597,12 @@
             
             document.getElementById('totalSubjects').textContent = totalSubjects;
             document.getElementById('totalPeople').textContent = totalPeople;
+        }
+
+        // Обновить статистику по спискам
+        function updateListsStats(lists) {
+            let totalLists = Object.keys(lists).length;
+            document.getElementById('totalLists').textContent = totalLists;
         }
     </script>
 </body>
