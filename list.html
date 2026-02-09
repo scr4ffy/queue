@@ -15,7 +15,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
         }
@@ -30,7 +30,7 @@
         }
 
         header {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 30px;
             text-align: center;
@@ -40,6 +40,11 @@
         h1 {
             font-size: 2.5em;
             margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
         }
 
         .back-btn {
@@ -105,13 +110,13 @@
         }
 
         input:focus, select:focus {
-            border-color: #4facfe;
+            border-color: #667eea;
             outline: none;
-            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
         .btn {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
             padding: 14px 28px;
@@ -127,7 +132,7 @@
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 7px 20px rgba(79, 172, 254, 0.3);
+            box-shadow: 0 7px 20px rgba(102, 126, 234, 0.3);
         }
 
         .btn-danger {
@@ -159,7 +164,7 @@
 
         .list-card:hover {
             transform: translateY(-5px);
-            border-color: #4facfe;
+            border-color: #667eea;
         }
 
         .list-header {
@@ -223,7 +228,7 @@
             display: flex;
             align-items: center;
             gap: 15px;
-            border-left: 4px solid #4facfe;
+            border-left: 4px solid #667eea;
             transition: background 0.2s;
         }
 
@@ -235,6 +240,7 @@
             width: 22px;
             height: 22px;
             cursor: pointer;
+            accent-color: #667eea;
         }
 
         .item-content {
@@ -291,7 +297,7 @@
         .stats {
             display: flex;
             justify-content: space-around;
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 20px;
             border-radius: 15px;
@@ -310,6 +316,30 @@
         .stat-label {
             font-size: 0.9em;
             opacity: 0.9;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #00b894;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
         }
 
         @media (max-width: 768px) {
@@ -334,6 +364,10 @@
                 margin-bottom: 20px;
                 align-self: flex-start;
             }
+            
+            .form-row {
+                flex-direction: column;
+            }
         }
 
         footer {
@@ -356,6 +390,11 @@
         </header>
 
         <div class="main-content">
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <span id="statusText">Подключено к серверу ✓</span>
+            </div>
+
             <div class="card">
                 <h2><i class="fas fa-plus-circle"></i> Создать новый список</h2>
                 <div class="input-group">
@@ -394,7 +433,7 @@
 
         <footer>
             <p style="margin-top: 10px; font-size: 0.9em;">
-                <i class="fas fa-user-check"></i> Назначайте задачи и отслеживайте прогресс
+                <i class="fas fa-sync-alt"></i> Данные обновляются в реальном времени
             </p>
         </footer>
     </div>
