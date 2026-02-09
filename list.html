@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление списками</title>
+    <link rel="icon" href="logo.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .back-btn {
+            position: absolute;
+            left: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid #e9ecef;
+        }
+
+        h2 {
+            color: #495057;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        input:focus, select:focus {
+            border-color: #4facfe;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(79, 172, 254, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .lists-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .list-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            border: 2px solid #e9ecef;
+            transition: transform 0.3s;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .list-card:hover {
+            transform: translateY(-5px);
+            border-color: #4facfe;
+        }
+
+        .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f1f3f5;
+        }
+
+        .list-title {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #495057;
+            flex-grow: 1;
+        }
+
+        .list-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2em;
+            padding: 8px;
+            border-radius: 8px;
+            transition: background 0.2s;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-btn:hover {
+            background: rgba(0,0,0,0.05);
+        }
+
+        .delete-btn {
+            color: #e74c3c;
+        }
+
+        .add-btn {
+            color: #00b894;
+        }
+
+        .items-container {
+            flex-grow: 1;
+            margin-bottom: 20px;
+        }
+
+        .item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-left: 4px solid #4facfe;
+            transition: background 0.2s;
+        }
+
+        .item:hover {
+            background: #e9ecef;
+        }
+
+        .item-checkbox {
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+        }
+
+        .item-content {
+            flex-grow: 1;
+        }
+
+        .item-name {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .item-person {
+            font-size: 0.9em;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        .item-completed {
+            opacity: 0.6;
+            border-left-color: #00b894;
+        }
+
+        .item-completed .item-name {
+            text-decoration: line-through;
+        }
+
+        .add-item-form {
+            background: #f1f3f5;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .form-row input {
+            flex-grow: 1;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+            padding: 40px 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 30px 0;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            .lists-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .list-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .list-actions {
+                align-self: flex-end;
+            }
+            
+            .back-btn {
+                position: relative;
+                left: 0;
+                top: 0;
+                transform: none;
+                margin-bottom: 20px;
+                align-self: flex-start;
+            }
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #6c757d;
+            border-top: 1px solid #dee2e6;
+            background: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <button class="back-btn" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i> Назад к очередям
+            </button>
+            <h1><i class="fas fa-list-check"></i> Управление списками</h1>
+            <p class="subtitle">Создавайте списки с задачами и назначайте ответственных</p>
+        </header>
+
+        <div class="main-content">
+            <div class="card">
+                <h2><i class="fas fa-plus-circle"></i> Создать новый список</h2>
+                <div class="input-group">
+                    <label for="newListName">Название списка:</label>
+                    <input type="text" id="newListName" placeholder="Например: Список задач на неделю, Покупки...">
+                </div>
+                <button class="btn" onclick="createList()">
+                    <i class="fas fa-plus"></i> Создать список
+                </button>
+            </div>
+
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-number" id="totalLists">0</div>
+                    <div class="stat-label">Всего списков</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="totalItems">0</div>
+                    <div class="stat-label">Всего элементов</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="completedItems">0</div>
+                    <div class="stat-label">Выполнено</div>
+                </div>
+            </div>
+
+            <h2><i class="fas fa-layer-group"></i> Ваши списки</h2>
+            <div id="listsContainer">
+                <div class="empty-message">
+                    <i class="fas fa-clipboard-list fa-3x" style="margin-bottom: 15px; color: #adb5bd;"></i>
+                    <h3>Списков пока нет</h3>
+                    <p>Создайте первый список для управления задачами</p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p style="margin-top: 10px; font-size: 0.9em;">
+                <i class="fas fa-user-check"></i> Назначайте задачи и отслеживайте прогресс
+            </p>
+        </footer>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    
+    <script>
+        // Конфигурация Firebase (такая же как в основном файле)
+        const firebaseConfig = {
+          apiKey: "AIzaSyBSGrGWgp_O3QTSF3PyXxjYC2nHo0UBi1U",
+          authDomain: "queue-20edb.firebaseapp.com",
+          databaseURL: "https://queue-20edb-default-rtdb.firebaseio.com",
+          projectId: "queue-20edb",
+          storageBucket: "queue-20edb.firebasestorage.app",
+          messagingSenderId: "744872622664",
+          appId: "1:744872622664:web:976d6da20e70a70978767d",
+          measurementId: "G-CNLRC5FY21"
+        };
+
+        // Инициализация Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Назад к очередям
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+
+        // Создать новый список
+        function createList() {
+            const listName = document.getElementById('newListName').value.trim();
+            if (!listName) {
+                alert('Введите название списка');
+                return;
+            }
+
+            const newListRef = database.ref('lists').push();
+            newListRef.set({
+                name: listName,
+                items: {},
+                createdAt: new Date().toISOString()
+            }).then(() => {
+                document.getElementById('newListName').value = '';
+                alert(`Список "${listName}" создан!`);
+            });
+        }
+
+        // Добавить элемент в список
+        function addListItem(listId) {
+            const itemName = document.getElementById(`itemName_${listId}`).value.trim();
+            const itemPerson = document.getElementById(`itemPerson_${listId}`).value.trim();
+            
+            if (!itemName) {
+                alert('Введите название элемента');
+                return;
+            }
+
+            const newItemRef = database.ref(`lists/${listId}/items`).push();
+            newItemRef.set({
+                name: itemName,
+                person: itemPerson || 'Не назначено',
+                completed: false,
+                createdAt: new Date().toISOString(),
+                addedAt: new Date().toLocaleString('ru-RU')
+            }).then(() => {
+                document.getElementById(`itemName_${listId}`).value = '';
+                document.getElementById(`itemPerson_${listId}`).value = '';
+            });
+        }
+
+        // Удалить список
+        function deleteList(listId) {
+            if (confirm('Удалить этот список и все его элементы?')) {
+                database.ref(`lists/${listId}`).remove();
+            }
+        }
+
+        // Переключить статус элемента
+        function toggleItem(listId, itemId, currentStatus) {
+            database.ref(`lists/${listId}/items/${itemId}/completed`).set(!currentStatus);
+        }
+
+        // Удалить элемент
+        function deleteItem(listId, itemId) {
+            if (confirm('Удалить этот элемент?')) {
+                database.ref(`lists/${listId}/items/${itemId}`).remove();
+            }
+        }
+
+        // Отобразить все списки
+        function renderAllLists(lists) {
+            const container = document.getElementById('listsContainer');
+            
+            if (Object.keys(lists).length === 0) {
+                container.innerHTML = `
+                    <div class="empty-message">
+                        <i class="fas fa-clipboard-list fa-3x" style="margin-bottom: 15px; color: #adb5bd;"></i>
+                        <h3>Списков пока нет</h3>
+                        <p>Создайте первый список для управления задачами</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = '';
+            
+            Object.keys(lists).forEach(listId => {
+                const list = lists[listId];
+                const items = list.items || {};
+                const itemsArray = Object.keys(items).map(key => ({
+                    id: key,
+                    ...items[key]
+                }));
+                
+                const listCard = document.createElement('div');
+                listCard.className = 'list-card';
+                
+                let itemsHTML = '';
+                
+                if (itemsArray.length === 0) {
+                    itemsHTML = '<div class="empty-message" style="padding: 15px;">Список пуст</div>';
+                } else {
+                    itemsArray.forEach(item => {
+                        itemsHTML += `
+                            <div class="item ${item.completed ? 'item-completed' : ''}">
+                                <input type="checkbox" 
+                                       class="item-checkbox" 
+                                       ${item.completed ? 'checked' : ''}
+                                       onchange="toggleItem('${listId}', '${item.id}', ${item.completed})">
+                                <div class="item-content">
+                                    <div class="item-name">${item.name}</div>
+                                    <div class="item-person">
+                                        <i class="fas fa-user"></i> ${item.person}
+                                    </div>
+                                </div>
+                                <button class="action-btn delete-btn" onclick="deleteItem('${listId}', '${item.id}')" title="Удалить">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        `;
+                    });
+                }
+                
+                listCard.innerHTML = `
+                    <div class="list-header">
+                        <div class="list-title">
+                            <i class="fas fa-list"></i> ${list.name}
+                        </div>
+                        <div class="list-actions">
+                            <button class="action-btn delete-btn" onclick="deleteList('${listId}')" title="Удалить список">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="items-container">
+                        ${itemsHTML}
+                    </div>
+                    
+                    <div class="add-item-form">
+                        <div class="form-row">
+                            <input type="text" 
+                                   id="itemName_${listId}" 
+                                   placeholder="Название задачи">
+                            <input type="text" 
+                                   id="itemPerson_${listId}" 
+                                   placeholder="Ответственный">
+                        </div>
+                        <button class="btn" onclick="addListItem('${listId}')">
+                            <i class="fas fa-plus"></i> Добавить элемент
+                        </button>
+                    </div>
+                    
+                    <div style="margin-top: 15px; font-size: 0.9em; color: #6c757d;">
+                        <i class="fas fa-tasks"></i> Элементов: ${itemsArray.length} | 
+                        <i class="fas fa-check-circle"></i> Выполнено: ${itemsArray.filter(item => item.completed).length}
+                    </div>
+                `;
+                
+                container.appendChild(listCard);
+            });
+        }
+
+        // Обновить статистику
+        function updateStats(lists) {
+            let totalLists = Object.keys(lists).length;
+            let totalItems = 0;
+            let completedItems = 0;
+            
+            Object.values(lists).forEach(list => {
+                const items = list.items || {};
+                totalItems += Object.keys(items).length;
+                completedItems += Object.values(items).filter(item => item.completed).length;
+            });
+            
+            document.getElementById('totalLists').textContent = totalLists;
+            document.getElementById('totalItems').textContent = totalItems;
+            document.getElementById('completedItems').textContent = completedItems;
+        }
+
+        // Слушаем изменения в базе данных
+        database.ref('lists').on('value', (snapshot) => {
+            const lists = snapshot.val() || {};
+            renderAllLists(lists);
+            updateStats(lists);
+        });
+    </script>
+</body>
+</html>
