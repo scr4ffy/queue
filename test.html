@@ -1,3 +1,8 @@
+Хорошо, реализуем функцию автоматического удаления предмета (вместе с его очередью) после заданной даты. Функция будет включаться при создании предмета. Так как вся логика должна быть в одном HTML-файле, мы будем использовать `setInterval` в браузере для периодической проверки даты.
+
+Вот обновлённый код HTML со всеми необходимыми изменениями:
+
+```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -16,8 +21,7 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
+            min-height: 100vh 20px;
         }
 
         .container {
@@ -27,10 +31,7 @@
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             overflow: hidden;
-        }
-
-        header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 30px;
             text-align: center;
@@ -136,7 +137,22 @@
             transition: transform 0.3s;
         }
 
-        .subject-card:hover {
+        /* Стиль для просроченного предмета */
+        .subject-card.expired {
+            border-color: #e74c3c;
+            background-color: #fcf0f0;
+        }
+
+        .subject-card.expired .subject-title {
+            color: #e74c3c;
+            text-decoration: line-through;
+        }
+
+         .subject-card.expired .queue-item {
+            opacity: 0.6;
+        }
+
+        .subject-card:hover:not(.expired) { /* Hover только для активных карточек */
             transform: translateY(-5px);
             border-color: #667eea;
         }
@@ -328,6 +344,17 @@
                     <label for="newSubject">Название предмета:</label>
                     <input type="text" id="newSubject" placeholder="Например: Математика, Физика, Программирование...">
                 </div>
+                <!-- Новые поля для даты и чекбокса -->
+                <div class="input-group">
+                    <label>
+                        <input type="checkbox" id="enableAutoDelete"> Включить автоматическое удаление после даты
+                    </label>
+                </div>
+                <div class="input-group" id="autoDeleteDateGroup" style="display: none;">
+                    <label for="autoDeleteDate">Дата автоматического удаления:</label>
+                    <input type="date" id="autoDeleteDate">
+                </div>
+                <!-- /Новые поля -->
                 <button class="btn" onclick="addNewSubject()">
                     <i class="fas fa-plus"></i> Добавить предмет
                 </button>
@@ -402,10 +429,54 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
+        // --- Новые функции для работы с датой ---
+        // Показ/скрытие поля даты
+        document.getElementById('enableAutoDelete').addEventListener('change', function() {
+            const dateGroup = document.getElementById('autoDeleteDateGroup');
+            dateGroup.style.display = this.checked ? 'block' : 'none';
+        });
+
+        // Функция проверки истечения срока действия
+        function isExpired(expirationDateStr) {
+            if (!expirationDateStr) return false; // Если дата не установлена, не считается просроченным
+            const now = new Date(); // Текущая дата (без времени)
+            now.setHours(0, 0, 0, 0);
+
+            const expirationDate = new Date(expirationDateStr); // Дата из базы
+            expirationDate.setHours(0, 0, 0, 0); // Установим время на 00:00:00
+
+            return now >= expirationDate; // Просрочен, если сегодня или позже даты
+        }
+
+        // Функция для очистки просроченных предметов из базы данных
+        function cleanupExpiredSubjects() {
+            // console.log("Проверка просроченных предметов..."); // Для отладки
+            database.ref('subjects').once('value').then((snapshot) => {
+                const subjects = snapshot.val();
+                if (subjects) {
+                    Object.keys(subjects).forEach(subjectId => {
+                        const subjectData = subjects[subjectId];
+                        if (isExpired(subjectData.autoDeleteDate)) {
+                             console.log(`Удаляем просроченный предмет: ${subjectData.name} (${subjectId})`); // Для отладки
+                            // Удаляем весь предмет (включая очередь)
+                            database.ref(`subjects/${subjectId}`).remove()
+                                .catch(error => console.error("Ошибка при удалении просроченного предмета:", error));
+                        }
+                    });
+                }
+            }).catch(error => console.error("Ошибка при получении данных для очистки:", error));
+        }
+
+        // Запускаем проверку каждые 10 минут (600000 миллисекунд)
+        // В реальных условиях возможно стоит увеличить интервал или использовать Cloud Functions
+        setInterval(cleanupExpiredSubjects, 10 * 60 * 1000);
+
+        // --- Конец новых функций ---
+
         // Слушаем изменения в базе данных
         database.ref('subjects').on('value', (snapshot) => {
             const subjects = snapshot.val() || {};
-            renderAllQueues(subjects);
+            renderAllQueues(subjects); // Передаём объект subjects
             updateStats(subjects);
             updateSubjectDropdown(subjects);
         });
@@ -419,19 +490,42 @@
         // Добавить новый предмет
         function addNewSubject() {
             const subjectName = document.getElementById('newSubject').value.trim();
+            const enableAutoDelete = document.getElementById('enableAutoDelete').checked;
+            let autoDeleteDate = null;
+
+            if (enableAutoDelete) {
+                autoDeleteDate = document.getElementById('autoDeleteDate').value.trim();
+                if (!autoDeleteDate) {
+                    alert('Пожалуйста, укажите дату автоматического удаления.');
+                    return;
+                }
+            }
+
             if (!subjectName) {
                 alert('Введите название предмета');
                 return;
             }
 
             const newSubjectRef = database.ref('subjects').push();
-            newSubjectRef.set({
+            const newSubjectData = {
                 name: subjectName,
                 queue: [],
                 createdAt: new Date().toISOString()
-            }).then(() => {
+            };
+            // Добавляем дату удаления в данные, если она установлена
+            if (autoDeleteDate) {
+                 newSubjectData.autoDeleteDate = autoDeleteDate;
+            }
+
+            newSubjectRef.set(newSubjectData).then(() => {
                 document.getElementById('newSubject').value = '';
+                document.getElementById('enableAutoDelete').checked = false;
+                document.getElementById('autoDeleteDate').value = '';
+                document.getElementById('autoDeleteDateGroup').style.display = 'none'; // Скрыть группу снова
                 alert(`Предмет "${subjectName}" добавлен!`);
+            }).catch(error => {
+                console.error("Ошибка при добавлении предмета: ", error);
+                alert("Произошла ошибка при добавлении предмета.");
             });
         }
 
@@ -439,27 +533,51 @@
         function addToQueue() {
             const subjectId = document.getElementById('selectSubject').value;
             const userName = document.getElementById('userName').value.trim();
-            
+
             if (!subjectId) {
                 alert('Выберите предмет');
                 return;
             }
-            
+
             if (!userName) {
                 alert('Введите ваше имя');
                 return;
             }
-            
-            const userRef = database.ref(`subjects/${subjectId}/queue`).push();
-            userRef.set({
-                name: userName,
-                timestamp: new Date().toISOString(),
-                addedAt: new Date().toLocaleString('ru-RU')
-            }).then(() => {
-                document.getElementById('userName').value = '';
-                alert(`${userName}, вы в очереди!`);
+
+            // Получаем данные предмета перед добавлением, чтобы проверить дату
+            database.ref(`subjects/${subjectId}`).once('value').then(snapshot => {
+                const subjectData = snapshot.val();
+
+                if (!subjectData) {
+                    alert("Предмет не найден.");
+                    return;
+                }
+
+                // Проверяем, не просрочен ли предмет
+                if (isExpired(subjectData.autoDeleteDate)) {
+                     alert("Извините, очередь для этого предмета уже закрыта.");
+                     return; // Не добавляем в очередь
+                }
+
+
+                const userRef = database.ref(`subjects/${subjectId}/queue`).push();
+                userRef.set({
+                    name: userName,
+                    timestamp: new Date().toISOString(),
+                    addedAt: new Date().toLocaleString('ru-RU')
+                }).then(() => {
+                    document.getElementById('userName').value = '';
+                    alert(`${userName}, вы в очереди!`);
+                }).catch(error => {
+                    console.error("Ошибка при добавлении в очередь: ", error);
+                    alert("Произошла ошибка при добавлении в очередь.");
+                });
+            }).catch(error => {
+                console.error("Ошибка при проверке даты предмета: ", error);
+                alert("Произошла ошибка при проверке статуса предмета.");
             });
         }
+
 
         // Завершить очередь для человека
         function completeQueueItem(subjectId, queueId) {
@@ -503,19 +621,23 @@
         function updateSubjectDropdown(subjects) {
             const select = document.getElementById('selectSubject');
             select.innerHTML = '<option value="">-- Выберите предмет --</option>';
-            
+
             Object.keys(subjects).forEach(subjectId => {
-                const option = document.createElement('option');
-                option.value = subjectId;
-                option.textContent = subjects[subjectId].name;
-                select.appendChild(option);
+                const subjectData = subjects[subjectId];
+                // Проверяем, не просрочен ли предмет для выпадающего списка
+                if (!isExpired(subjectData.autoDeleteDate)) {
+                    const option = document.createElement('option');
+                    option.value = subjectId;
+                    option.textContent = subjectData.name;
+                    select.appendChild(option);
+                }
             });
         }
 
         // Отобразить все очереди
         function renderAllQueues(subjects) {
             const container = document.getElementById('queuesContainer');
-            
+
             if (Object.keys(subjects).length === 0) {
                 container.innerHTML = `
                     <div class="empty-message">
@@ -526,49 +648,56 @@
                 `;
                 return;
             }
-            
+
             container.innerHTML = '';
-            
+
             Object.keys(subjects).forEach(subjectId => {
-                const subject = subjects[subjectId];
-                const queue = subject.queue || {};
-                const queueArray = Object.keys(queue).map(key => ({
-                    id: key,
-                    ...queue[key]
-                }));
-                
+                const subjectData = subjects[subjectId];
+
                 const subjectCard = document.createElement('div');
-                subjectCard.className = 'subject-card';
-                
+                // Добавляем класс 'expired', если дата просрочена
+                subjectCard.className = isExpired(subjectData.autoDeleteDate) ? 'subject-card expired' : 'subject-card';
+
                 let queueHTML = '';
-                
-                if (queueArray.length === 0) {
-                    queueHTML = '<div class="empty-message" style="padding: 15px;">Очередь пуста</div>';
+                // Если предмет просрочен, отображаем специальное сообщение
+                if (isExpired(subjectData.autoDeleteDate)) {
+                     queueHTML = '<div class="empty-message" style="padding: 15px; color: #e74c3c;"><i class="fas fa-clock"></i> Эта очередь просрочена и закрыта.</div>';
                 } else {
-                    queueArray.forEach((person, index) => {
-                        queueHTML += `
-                            <div class="queue-item ${index === 0 ? 'current' : ''}">
-                                <div style="display: flex; align-items: center;">
-                                    <div class="queue-number">${index + 1}</div>
-                                    <div class="queue-info">
-                                        <strong>${person.name}</strong>
-                                        <div class="queue-time">Добавлен: ${person.addedAt || 'только что'}</div>
+                    const queue = subjectData.queue || {};
+                    const queueArray = Object.keys(queue).map(key => ({
+                        id: key,
+                        ...queue[key]
+                    }));
+
+                    if (queueArray.length === 0) {
+                        queueHTML = '<div class="empty-message" style="padding: 15px;">Очередь пуста</div>';
+                    } else {
+                        queueArray.forEach((person, index) => {
+                            queueHTML += `
+                                <div class="queue-item ${index === 0 ? 'current' : ''}">
+                                    <div style="display: flex; align-items: center;">
+                                        <div class="queue-number">${index + 1}</div>
+                                        <div class="queue-info">
+                                            <strong>${person.name}</strong>
+                                            <div class="queue-time">Добавлен: ${person.addedAt || 'только что'}</div>
+                                        </div>
+                                    </div>
+                                    <div class="queue-actions">
+                                        <button class="action-btn complete-btn" onclick="completeQueueItem('${subjectId}', '${person.id}')" title="Завершить">
+                                            <i class="fas fa-check-circle"></i>
+                                        </button>
                                     </div>
                                 </div>
-                                <div class="queue-actions">
-                                    <button class="action-btn complete-btn" onclick="completeQueueItem('${subjectId}', '${person.id}')" title="Завершить">
-                                        <i class="fas fa-check-circle"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        `;
-                    });
+                            `;
+                        });
+                    }
                 }
-                
+
                 subjectCard.innerHTML = `
                     <div class="subject-header">
                         <div class="subject-title">
-                            <i class="fas fa-book"></i> ${subject.name}
+                            <i class="fas fa-book"></i> ${subjectData.name}
+                            ${isExpired(subjectData.autoDeleteDate) ? ' (Просрочено)' : ''}
                         </div>
                         <button class="action-btn delete-btn" onclick="deleteSubject('${subjectId}')" title="Удалить предмет">
                             <i class="fas fa-trash"></i>
@@ -578,10 +707,10 @@
                         ${queueHTML}
                     </div>
                     <div style="margin-top: 15px; font-size: 0.9em; color: #6c757d;">
-                        <i class="fas fa-users"></i> В очереди: ${queueArray.length} человек
+                        <i class="fas fa-users"></i> В очереди: ${isExpired(subjectData.autoDeleteDate) ? 0 : Object.keys(subjectData.queue || {}).length} человек
                     </div>
                 `;
-                
+
                 container.appendChild(subjectCard);
             });
         }
@@ -589,13 +718,16 @@
         // Обновить статистику
         function updateStats(subjects) {
             let totalPeople = 0;
-            let totalSubjects = Object.keys(subjects).length;
-            
+            let totalActiveSubjects = 0; // Считаем только активные (непросроченные)
+
             Object.values(subjects).forEach(subject => {
-                totalPeople += Object.keys(subject.queue || {}).length;
+                if (!isExpired(subject.autoDeleteDate)) {
+                    totalActiveSubjects++;
+                    totalPeople += Object.keys(subject.queue || {}).length;
+                }
             });
-            
-            document.getElementById('totalSubjects').textContent = totalSubjects;
+
+            document.getElementById('totalSubjects').textContent = totalActiveSubjects;
             document.getElementById('totalPeople').textContent = totalPeople;
         }
 
@@ -607,3 +739,4 @@
     </script>
 </body>
 </html>
+```
