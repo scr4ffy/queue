@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -65,9 +64,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
-        }
-
-        .input-group {
+       -group {
             margin-bottom: 20px;
         }
 
@@ -333,6 +330,18 @@
             background: #6c757d; /* Пример альтернативного цвета фона для номера */
             /* Или используйте основной цвет темы, но с учётом фона карточки */
             /* color: white; /* Цвет текста номера */
+        }
+
+        /* Стиль для отображения даты окончания */
+        .auto-delete-date {
+            font-size: 0.85em;
+            color: #6c757d;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        .subject-card.expired .auto-delete-date {
+            color: #e74c3c;
         }
         /* --- Конец нового CSS --- */
 
@@ -710,6 +719,14 @@
                     }
                 }
 
+                // Формируем строку с датой окончания
+                let endDateHtml = '';
+                if (subjectData.autoDeleteDate) {
+                    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                    const formattedDate = new Date(subjectData.autoDeleteDate).toLocaleDateString('ru-RU', options);
+                    endDateHtml = `<div class="auto-delete-date">Закроется: ${formattedDate}</div>`;
+                }
+
                 subjectCard.innerHTML = `
                     <div class="subject-header">
                         <div class="subject-title">
@@ -720,6 +737,7 @@
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
+                    ${endDateHtml} <!-- Добавляем дату окончания -->
                     <div class="queue-list">
                         ${queueHTML}
                     </div>
@@ -744,7 +762,7 @@
                 }
             });
 
-            document.getElementById('totalSubjects').textContent = totalActiveSubjects;
+totalSubjects').textContent = totalActiveSubjects;
             document.getElementById('totalPeople').textContent = totalPeople;
         }
 
