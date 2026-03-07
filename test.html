@@ -1,7 +1,3 @@
-Хорошо, реализуем функцию автоматического удаления предмета (вместе с его очередью) после заданной даты. Функция будет включаться при создании предмета. Так как вся логика должна быть в одном HTML-файле, мы будем использовать `setInterval` в браузере для периодической проверки даты.
-
-Вот обновлённый код HTML со всеми необходимыми изменениями:
-
 ```html
 <!DOCTYPE html>
 <html lang="ru">
@@ -21,7 +17,8 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh 20px;
+            min-height: 100vh;
+            padding: 20px;
         }
 
         .container {
@@ -31,7 +28,10 @@
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             overflow: hidden;
-                   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 30px;
             text-align: center;
@@ -319,6 +319,23 @@
             border-top: 1px solid #dee2e6;
             background: #f8f9fa;
         }
+
+        /* --- Новый CSS для обеспечения читаемости текста в просроченной очереди --- */
+        .subject-card.expired .queue-item strong,
+        .subject-card.expired .queue-item .queue-info,
+        .subject-card.expired .queue-item .queue-time {
+            color: #495057; /* Явно задаём тёмный цвет текста */
+            opacity: 1; /* Важно: восстанавливаем полную непрозрачность текста */
+        }
+
+        .subject-card.expired .queue-number {
+            /* Цвет фона номера может также захотеть изменить для лучшей видимости на #fcf0f0 */
+            background: #6c757d; /* Пример альтернативного цвета фона для номера */
+            /* Или используйте основной цвет темы, но с учётом фона карточки */
+            /* color: white; /* Цвет текста номера */
+        }
+        /* --- Конец нового CSS --- */
+
     </style>
 </head>
 <body>
