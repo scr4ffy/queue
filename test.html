@@ -64,7 +64,9 @@
             display: flex;
             align-items: center;
             gap: 10px;
-       -group {
+        }
+
+        .input-group {
             margin-bottom: 20px;
         }
 
@@ -619,8 +621,7 @@
             }
         }
 
-        // Создать новый список
-        function createNewList() {
+        // Создать новый createNewList() {
             const listName = document.getElementById('listName').value.trim();
             if (!listName) {
                 alert('Введите название списка');
@@ -731,7 +732,7 @@
                     <div class="subject-header">
                         <div class="subject-title">
                             <i class="fas fa-book"></i> ${subjectData.name}
-                            ${isExpired(subjectData.autoDeleteDate) ? ' (Просрочено)' : ''}
+(subjectData.autoDeleteDate) ? ' (Просрочено)' : ''}
                         </div>
                         <button class="action-btn delete-btn" onclick="deleteSubject('${subjectId}')" title="Удалить предмет">
                             <i class="fas fa-trash"></i>
@@ -762,7 +763,7 @@
                 }
             });
 
-totalSubjects').textContent = totalActiveSubjects;
+            document.getElementById('totalSubjects').textContent = totalActiveSubjects;
             document.getElementById('totalPeople').textContent = totalPeople;
         }
 
